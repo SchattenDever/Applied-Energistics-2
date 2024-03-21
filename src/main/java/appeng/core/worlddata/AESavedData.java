@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.core.HolderLookup;
 import org.slf4j.Logger;
 
 import net.minecraft.nbt.CompoundTag;
@@ -22,7 +23,7 @@ public abstract class AESavedData extends SavedData {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Override
-    public void save(File file) {
+    public void save(File file, HolderLookup.Provider provider) {
         if (!this.isDirty()) {
             return;
         }
@@ -31,7 +32,7 @@ public abstract class AESavedData extends SavedData {
         var tempFile = targetPath.getParent().resolve(file.getName() + ".temp");
 
         CompoundTag compoundTag = new CompoundTag();
-        compoundTag.put("data", this.save(new CompoundTag()));
+        compoundTag.put("data", this.save(new CompoundTag(), provider));
         NbtUtils.addCurrentDataVersion(compoundTag);
         try {
             // Write to temp file first.

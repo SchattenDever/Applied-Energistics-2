@@ -23,6 +23,7 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -109,7 +110,7 @@ public class SpatialStorageWorldData extends AESavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
         tag.putInt(TAG_FORMAT, CURRENT_FORMAT);
 
         ListTag plotTags = new ListTag();

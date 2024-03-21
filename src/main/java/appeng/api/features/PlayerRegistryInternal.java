@@ -25,6 +25,7 @@ import java.util.UUID;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
@@ -68,7 +69,7 @@ final class PlayerRegistryInternal extends AESavedData implements IPlayerRegistr
         return overworld.getDataStorage().computeIfAbsent(
                 new Factory<>(
                         () -> new PlayerRegistryInternal(server),
-                        nbt -> PlayerRegistryInternal.load(server, nbt),
+                        (nbt, provider) -> PlayerRegistryInternal.load(server, nbt),
                         null),
                 PlayerRegistryInternal.NAME);
     }
@@ -103,7 +104,7 @@ final class PlayerRegistryInternal extends AESavedData implements IPlayerRegistr
         long[] profileIds = nbt.getLongArray(TAG_PROFILE_IDS);
 
         if (playerIds.length * 2 != profileIds.length) {
-            throw new IllegalStateException("Plaer ID mapping is corrupted. " + playerIds.length + " player IDs vs. "
+            throw new IllegalStateException("Player ID mapping is corrupted. " + playerIds.length + " player IDs vs. "
                     + profileIds.length + " profile IDs (latter must be 2 * the former)");
         }
 
@@ -120,8 +121,10 @@ final class PlayerRegistryInternal extends AESavedData implements IPlayerRegistr
         return result;
     }
 
+
+
     @Override
-    public CompoundTag save(CompoundTag compound) {
+    public CompoundTag save(CompoundTag compound, HolderLookup.Provider provider) {
         int index = 0;
         int[] playerIds = new int[mapping.size()];
         long[] profileIds = new long[mapping.size() * 2];
