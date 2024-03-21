@@ -130,7 +130,7 @@ class AEItemKeyTest {
     void testFuzzyEqualsDifferentNbt() {
         var pick1 = new ItemStack(Items.DIAMOND_PICKAXE);
         var pick2 = new ItemStack(Items.DIAMOND_PICKAXE);
-        pick2.enchant(Enchantments.BLOCK_FORTUNE, 2);
+        pick2.enchant(Enchantments.FORTUNE, 2);
         assertNotEquals(pick1.getTag(), pick2.getTag());
 
         assertTrue(AEItemKey.of(pick1).fuzzyEquals(AEItemKey.of(pick2), FuzzyMode.IGNORE_ALL));

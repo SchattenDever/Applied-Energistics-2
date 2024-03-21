@@ -146,7 +146,7 @@ public class BlockDropProvider extends BlockLootSubProvider implements IAE2DataP
         return createSilkTouchDispatchTable(cluster,
                 LootItem.lootTableItem(AEItems.CERTUS_QUARTZ_CRYSTAL)
                         .apply(SetItemCountFunction.setCount(ConstantValue.exactly(4)))
-                        .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE))
+                        .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.FORTUNE))
                         .apply(ApplyExplosionDecay.explosionDecay()));
     }
 

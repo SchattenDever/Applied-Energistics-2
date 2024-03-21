@@ -24,6 +24,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleOptions.Deserializer;
 import net.minecraft.core.particles.ParticleType;
@@ -73,7 +74,7 @@ public class EnergyParticleData implements ParticleOptions {
     }
 
     @Override
-    public String writeToString() {
+    public String writeToString(HolderLookup.Provider provider) {
         return String.format(Locale.ROOT, "%s %s", forItem ? "true" : "false",
                 direction.name().toLowerCase(Locale.ROOT));
     }

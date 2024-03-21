@@ -20,12 +20,14 @@ package appeng.items.tools.quartz;
 
 import java.util.function.Supplier;
 
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import appeng.core.AppEng;
 import appeng.datagen.providers.tags.ConventionTags;
+import net.minecraft.world.level.block.Block;
 
 public enum QuartzToolType {
     CERTUS("certus_quartz", () -> Ingredient.of(ConventionTags.CERTUS_QUARTZ)),
@@ -54,8 +56,8 @@ public enum QuartzToolType {
             }
 
             @Override
-            public int getLevel() {
-                return Tiers.IRON.getLevel();
+            public TagKey<Block> getIncorrectBlocksForDrops() {
+                return Tiers.IRON.getIncorrectBlocksForDrops();
             }
 
             @Override

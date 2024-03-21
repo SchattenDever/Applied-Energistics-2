@@ -220,7 +220,7 @@ public final class TestPlots {
     @TestPlot("all_terminals")
     public static void allTerminals(PlotBuilder plot) {
         var enchantedPickaxe = new ItemStack(Items.DIAMOND_PICKAXE);
-        enchantedPickaxe.enchant(Enchantments.BLOCK_FORTUNE, 3);
+        enchantedPickaxe.enchant(Enchantments.FORTUNE, 3);
         var enchantedPickaxeKey = AEItemKey.of(enchantedPickaxe);
 
         plot.creativeEnergyCell("0 -1 0");
@@ -787,7 +787,7 @@ public final class TestPlots {
         var drive = plot.drive(origin.east());
 
         var pickaxe = new ItemStack(Items.DIAMOND_PICKAXE);
-        pickaxe.enchant(Enchantments.BLOCK_FORTUNE, 1);
+        pickaxe.enchant(Enchantments.FORTUNE, 1);
         for (var i = 0; i < 10; i++) {
             var cell = drive.addItemCell64k();
             for (var j = 0; j < 63; j++) {
