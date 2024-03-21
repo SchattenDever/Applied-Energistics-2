@@ -542,7 +542,7 @@ class InternalInventoryTest {
             void testTakeMoreThanAvailable() {
                 assertEquals("15 minecraft:stick", inv.removeItems(30, ItemStack.EMPTY, null).toString());
 
-                assertThat(inv).noneMatch(s -> ItemStack.isSameItemSameTags(s, item1));
+                assertThat(inv).noneMatch(s -> ItemStack.isSameItemSameComponents(s, item1));
             }
 
             // When actual extraction for a slot is denied, the extraction does not lock onto the item type
@@ -570,7 +570,7 @@ class InternalInventoryTest {
                 // Only accept item 2
                 assertEquals("15 minecraft:stick", inv.removeItems(15, ItemStack.EMPTY, is -> {
                     calls.add(is.copy());
-                    return ItemStack.isSameItemSameTags(is, item2);
+                    return ItemStack.isSameItemSameComponents(is, item2);
                 }).toString());
 
                 // Up until the filter returns true, it will be called for all items,
@@ -588,7 +588,7 @@ class InternalInventoryTest {
             void testCalledWithSimulatedExtractionResult() {
                 var calls = new ArrayList<ItemStack>();
                 inv.removeItems(2, ItemStack.EMPTY, is -> {
-                    if (ItemStack.isSameItemSameTags(is, item3)) {
+                    if (ItemStack.isSameItemSameComponents(is, item3)) {
                         calls.add(is);
                         return true;
                     }

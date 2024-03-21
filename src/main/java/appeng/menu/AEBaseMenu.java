@@ -412,7 +412,7 @@ public abstract class AEBaseMenu extends AbstractContainerMenu {
                 for (Slot cs : this.slots) {
                     if (cs instanceof FakeSlot && !isPlayerSideSlot(cs)) {
                         var destination = cs.getItem();
-                        if (ItemStack.isSameItemSameTags(destination, tis)) {
+                        if (ItemStack.isSameItemSameComponents(destination, tis)) {
                             break; // Item is already in the filter
                         } else if (destination.isEmpty()) {
                             cs.set(tis.copy());
@@ -479,7 +479,7 @@ public abstract class AEBaseMenu extends AbstractContainerMenu {
     private boolean x(Slot clickSlot, ItemStack tis, Slot d) {
         final ItemStack t = d.getItem().copy();
 
-        if (ItemStack.isSameItemSameTags(t, tis)) {
+        if (ItemStack.isSameItemSameComponents(t, tis)) {
             int maxSize = t.getMaxStackSize();
             if (maxSize > d.getMaxStackSize()) {
                 maxSize = d.getMaxStackSize();

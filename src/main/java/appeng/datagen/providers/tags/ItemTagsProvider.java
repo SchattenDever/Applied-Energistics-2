@@ -51,6 +51,9 @@ public class ItemTagsProvider extends net.minecraft.data.tags.ItemTagsProvider i
     protected void addTags(HolderLookup.Provider provider) {
         copyBlockTags();
 
+        // Allow the annihilation plane to be enchanted with silk touch & fortune
+        tag(ItemTags.MINING_LOOT_ENCHANTABLE).add(AEParts.ANNIHILATION_PLANE.asItem());
+
         // Forge is missing this tag right now
         tag(ConventionTags.COPPER_INGOT)
                 .add(Items.COPPER_INGOT);

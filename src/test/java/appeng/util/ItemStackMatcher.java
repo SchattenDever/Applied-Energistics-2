@@ -24,7 +24,7 @@ public class ItemStackMatcher implements ArgumentMatcher<ItemStack> {
 
     @Override
     public boolean matches(ItemStack argument) {
-        return ItemStack.isSameItemSameTags(stack, argument)
+        return ItemStack.isSameItemSameComponents(stack, argument)
                 && !matchCount || stack.getCount() == argument.getCount();
     }
 

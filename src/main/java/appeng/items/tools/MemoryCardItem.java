@@ -24,6 +24,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 
+import net.minecraft.world.item.component.DyedItemColor;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.ChatFormatting;
@@ -39,7 +40,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -66,7 +66,7 @@ import appeng.util.InteractionUtil;
 import appeng.util.Platform;
 import appeng.util.inv.PlayerInternalInventory;
 
-public class MemoryCardItem extends AEBaseItem implements IMemoryCard, DyeableLeatherItem {
+public class MemoryCardItem extends AEBaseItem implements IMemoryCard {
 
     private static final int DEFAULT_BASE_COLOR = 0xDDDDDD;
 
@@ -406,13 +406,8 @@ public class MemoryCardItem extends AEBaseItem implements IMemoryCard, DyeableLe
     }
 
     // Override to change the default color
-    @Override
     public int getColor(ItemStack stack) {
-        CompoundTag compoundTag = stack.getTagElement(TAG_DISPLAY);
-        if (compoundTag != null && compoundTag.contains(TAG_COLOR, 99)) {
-            return compoundTag.getInt(TAG_COLOR);
-        }
-        return DEFAULT_BASE_COLOR;
+        return DyedItemColor.getOrDefault(stack, DEFAULT_BASE_COLOR);
     }
 
     public static int getTintColor(ItemStack stack, int tintIndex) {

@@ -185,7 +185,7 @@ public final class MemoryCardTestPlots {
             for (int i = 0; i < fromPatternInv.size(); i++) {
                 var fromItem = fromPatternInv.getStackInSlot(i);
                 var toItem = toPatternInv.getStackInSlot(i);
-                if (!ItemStack.isSameItemSameTags(fromItem, toItem)) {
+                if (!ItemStack.isSameItemSameComponents(fromItem, toItem)) {
                     helper.fail("Mismatch in slot " + i, origin.east());
                 }
             }

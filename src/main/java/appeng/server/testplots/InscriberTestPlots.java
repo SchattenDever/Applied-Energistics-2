@@ -81,19 +81,19 @@ public final class InscriberTestPlots {
                         var inscriber = (InscriberBlockEntity) plotTestHelper.getBlockEntity(BlockPos.ZERO);
                         var inv = inscriber.getInternalInventory();
                         plotTestHelper.check(
-                                ItemStack.isSameItemSameTags(inv.getStackInSlot(0), expectedTopSlot),
+                                ItemStack.isSameItemSameComponents(inv.getStackInSlot(0), expectedTopSlot),
                                 "Top slot is not as expected",
                                 BlockPos.ZERO);
                         plotTestHelper.check(
-                                ItemStack.isSameItemSameTags(inv.getStackInSlot(1), expectedBottomSlot),
+                                ItemStack.isSameItemSameComponents(inv.getStackInSlot(1), expectedBottomSlot),
                                 "Bottom slot is not as expected",
                                 BlockPos.ZERO);
                         plotTestHelper.check(
-                                ItemStack.isSameItemSameTags(inv.getStackInSlot(2), expectedMiddleSlot),
+                                ItemStack.isSameItemSameComponents(inv.getStackInSlot(2), expectedMiddleSlot),
                                 "Middle slot is not as expected",
                                 BlockPos.ZERO);
                         plotTestHelper.check(
-                                ItemStack.isSameItemSameTags(inv.getStackInSlot(3), expectedResult),
+                                ItemStack.isSameItemSameComponents(inv.getStackInSlot(3), expectedResult),
                                 "Result slot is not as expected",
                                 BlockPos.ZERO);
                     })

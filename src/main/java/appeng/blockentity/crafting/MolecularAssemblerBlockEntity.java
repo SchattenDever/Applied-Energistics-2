@@ -299,7 +299,7 @@ public class MolecularAssemblerBlockEntity extends AENetworkInvBlockEntity
         boolean reset = true;
 
         if (!is.isEmpty()) {
-            if (ItemStack.isSameItemSameTags(is, this.myPattern)) {
+            if (ItemStack.isSameItemSameComponents(is, this.myPattern)) {
                 reset = false;
             } else if (PatternDetailsHelper.decodePattern(is, getLevel(),
                     false) instanceof IMolecularAssemblerSupportedPattern supportedPattern) {

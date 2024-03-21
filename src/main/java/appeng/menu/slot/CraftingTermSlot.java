@@ -127,7 +127,7 @@ public class CraftingTermSlot extends AppEngCraftingSlot {
 
         for (var x = 0; x < maxTimesToCraft; x++) {
             // Stop if the recipe output has changed (i.e. due to fully consumed input slots)
-            if (!ItemStack.isSameItemSameTags(itemAtStart, getItem())) {
+            if (!ItemStack.isSameItemSameComponents(itemAtStart, getItem())) {
                 return;
             }
 

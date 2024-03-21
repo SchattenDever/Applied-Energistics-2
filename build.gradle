@@ -48,6 +48,7 @@ configurations {
 }
 
 repositories {
+    mavenLocal()
     maven {
         url "https://maven.shedaniel.me/"
         content {

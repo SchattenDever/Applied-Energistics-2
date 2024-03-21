@@ -48,7 +48,7 @@ public class AEBaseBlockItem extends BlockItem {
     @OnlyIn(Dist.CLIENT)
     public void addCheckedInformation(ItemStack itemStack, Level level, List<Component> toolTip,
             TooltipFlag advancedTooltips) {
-        this.blockType.appendHoverText(itemStack, level, toolTip, advancedTooltips);
+        this.blockType.appendHoverText(itemStack, level, toolTip, advancedTooltips, level.registryAccess());
     }
 
     @Override

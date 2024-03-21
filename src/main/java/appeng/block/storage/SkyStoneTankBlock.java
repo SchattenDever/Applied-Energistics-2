@@ -2,6 +2,7 @@ package appeng.block.storage;
 
 import java.util.List;
 
+import net.minecraft.core.RegistryAccess;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -13,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -43,8 +43,8 @@ public class SkyStoneTankBlock extends AEBaseEntityBlock<SkyStoneTankBlockEntity
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip,
-            TooltipFlag flag) {
-        super.appendHoverText(stack, level, tooltip, flag);
+                                TooltipFlag flag, @Nullable RegistryAccess registryAccess) {
+        super.appendHoverText(stack, level, tooltip, flag, registryAccess);
         tooltip.add(Tooltips.of(GuiText.TankBucketCapacity, SkyStoneTankBlockEntity.BUCKET_CAPACITY));
     }
 }

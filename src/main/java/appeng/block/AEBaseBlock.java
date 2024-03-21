@@ -18,6 +18,11 @@
 
 package appeng.block;
 
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -38,6 +43,8 @@ import appeng.api.orientation.IOrientableBlock;
 import appeng.api.orientation.IOrientationStrategy;
 import appeng.api.orientation.OrientationStrategies;
 import appeng.hooks.WrenchHook;
+
+import java.util.List;
 
 public abstract class AEBaseBlock extends Block implements IOrientableBlock {
 

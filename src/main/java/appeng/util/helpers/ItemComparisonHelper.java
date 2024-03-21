@@ -73,7 +73,7 @@ public final class ItemComparisonHelper {
     }
 
     /**
-     * Similar to {@link ItemStack#isSameItemSameTags}, but it can further check, if both are equal considering a
+     * Similar to {@link ItemStack#isSameItemSameComponents}, but it can further check, if both are equal considering a
      * {@link FuzzyMode}.
      *
      * @param mode how to compare the two {@link ItemStack}s
