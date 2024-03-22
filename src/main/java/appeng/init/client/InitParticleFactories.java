@@ -28,20 +28,20 @@ import appeng.client.render.effects.LightningFX;
 import appeng.client.render.effects.MatterCannonFX;
 import appeng.client.render.effects.ParticleTypes;
 import appeng.client.render.effects.VibrantFX;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 
 public final class InitParticleFactories {
 
     private InitParticleFactories() {
     }
 
-    public static void init() {
-        ParticleEngine particles = Minecraft.getInstance().particleEngine;
-        particles.register(ParticleTypes.CRAFTING, CraftingFx.Factory::new);
-        particles.register(ParticleTypes.ENERGY, EnergyFx.Factory::new);
-        particles.register(ParticleTypes.LIGHTNING_ARC, LightningArcFX.Factory::new);
-        particles.register(ParticleTypes.LIGHTNING, LightningFX.Factory::new);
-        particles.register(ParticleTypes.MATTER_CANNON, MatterCannonFX.Factory::new);
-        particles.register(ParticleTypes.VIBRANT, VibrantFX.Factory::new);
+    public static void init(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ParticleTypes.CRAFTING, CraftingFx.Factory::new);
+        event.registerSpriteSet(ParticleTypes.ENERGY, EnergyFx.Factory::new);
+        event.registerSpriteSet(ParticleTypes.LIGHTNING_ARC, LightningArcFX.Factory::new);
+        event.registerSpriteSet(ParticleTypes.LIGHTNING, LightningFX.Factory::new);
+        event.registerSpriteSet(ParticleTypes.MATTER_CANNON, MatterCannonFX.Factory::new);
+        event.registerSpriteSet(ParticleTypes.VIBRANT, VibrantFX.Factory::new);
     }
 
 }

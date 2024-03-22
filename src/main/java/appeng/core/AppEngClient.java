@@ -144,6 +144,7 @@ public class AppEngClient extends AppEngBase {
         modEventBus.addListener(this::registerEntityLayerDefinitions);
         modEventBus.addListener(this::registerHotkeys);
         modEventBus.addListener(this::registerDimensionSpecialEffects);
+        modEventBus.addListener(InitParticleFactories::init);
 
         BlockAttackHook.install();
         RenderBlockOutlineHook.install();

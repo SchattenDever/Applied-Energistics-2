@@ -45,7 +45,7 @@ public class EnergyParticleData implements ParticleOptions {
 
     public static final Deserializer<EnergyParticleData> DESERIALIZER = new Deserializer<EnergyParticleData>() {
         @Override
-        public EnergyParticleData fromCommand(ParticleType<EnergyParticleData> particleTypeIn, StringReader reader)
+        public EnergyParticleData fromCommand(ParticleType<EnergyParticleData> particleTypeIn, StringReader reader, HolderLookup.Provider registries)
                 throws CommandSyntaxException {
             reader.expect(' ');
             boolean forItem = reader.readBoolean();

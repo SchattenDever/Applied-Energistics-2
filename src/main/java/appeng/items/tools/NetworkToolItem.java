@@ -24,6 +24,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
+import appeng.api.inventories.InternalInventory;
+import appeng.api.upgrades.Upgrades;
+import appeng.util.inv.AppEngInternalInventory;
+import appeng.util.inv.InternalInventoryHost;
+import appeng.util.inv.filter.IAEItemFilter;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -176,6 +181,40 @@ public class NetworkToolItem extends AEBaseItem implements IMenuItem {
         stacks.sort(Comparator.comparingLong(GenericStack::amount).reversed());
 
         return Optional.of(new StorageCellTooltipComponent(List.of(), stacks, false, true));
+    }
+
+    /**
+     * Gets the internal inventory of the network tool. Changes to the inventory will be persisted to the stack.
+     */
+    public static InternalInventory getInventory(ItemStack stack) {
+        var inv = new AppEngInternalInventory(new InternalInventoryHost() {
+            @Override
+            public void saveChangedInventory(AppEngInternalInventory inv) {
+
+                inv.writeAsContainer(stack);
+            }
+
+            @Override
+            public boolean isClientSide() {
+                return false; // We always want events anyway
+            }
+        }, 9);
+        inv.setEnableClientEvents(true); // Also write to NBT on the client to prevent desyncs
+        inv.setFilter(new NetworkToolInventoryFilter());
+        inv.readFromContainer(stack);
+        return inv;
+    }
+
+    private static class NetworkToolInventoryFilter implements IAEItemFilter {
+        @Override
+        public boolean allowExtract(InternalInventory inv, int slot, int amount) {
+            return true;
+        }
+
+        @Override
+        public boolean allowInsert(InternalInventory inv, int slot, ItemStack stack) {
+            return Upgrades.isUpgradeCardItem(stack.getItem());
+        }
     }
 
     /**

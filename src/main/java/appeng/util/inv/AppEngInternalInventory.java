@@ -23,6 +23,8 @@ import java.util.Arrays;
 import com.google.common.base.Preconditions;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.ItemContainerContents;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -149,6 +151,15 @@ public class AppEngInternalInventory extends BaseInternalInventory {
             return this.filter.allowInsert(this, slot, stack);
         }
         return true;
+    }
+
+    public void writeAsContainer(ItemStack stack) {
+        stack.set(DataComponents.CONTAINER, ItemContainerContents.copyOf(stacks));
+    }
+
+    public void readFromContainer(ItemStack stack) {
+        var content = stack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
+        content.copyInto(stacks);
     }
 
     public void writeToNBT(CompoundTag data, String name, HolderLookup.Provider registries) {

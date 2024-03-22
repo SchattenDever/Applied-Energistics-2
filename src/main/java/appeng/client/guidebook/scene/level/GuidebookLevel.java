@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.world.level.saveddata.maps.MapId;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -234,17 +235,17 @@ public class GuidebookLevel extends Level {
 
     @Nullable
     @Override
-    public MapItemSavedData getMapData(String mapName) {
+    public MapItemSavedData getMapData(MapId mapId) {
         return null;
     }
 
     @Override
-    public void setMapData(String mapId, MapItemSavedData data) {
+    public void setMapData(MapId mapId, MapItemSavedData data) {
     }
 
     @Override
-    public int getFreeMapId() {
-        return 0;
+    public MapId getFreeMapId() {
+        return new MapId(1);
     }
 
     @Override
@@ -281,7 +282,7 @@ public class GuidebookLevel extends Level {
     }
 
     @Override
-    public void gameEvent(GameEvent gameEvent, Vec3 vec3, GameEvent.Context context) {
+    public void gameEvent(Holder<GameEvent> gameEvent, Vec3 vec3, GameEvent.Context context) {
     }
 
     @Override

@@ -21,6 +21,7 @@ package appeng.core;
 import java.util.Collection;
 import java.util.Collections;
 
+import appeng.api.ids.AEComponents;
 import com.mojang.brigadier.CommandDispatcher;
 
 import org.jetbrains.annotations.Nullable;
@@ -121,6 +122,7 @@ public abstract class AppEngBase implements AppEng {
         }
         INSTANCE = this;
 
+        AEComponents.finalizeRegistration(modEventBus);
         modEventBus.addListener(this::registerRegistries);
         modEventBus.addListener(MainCreativeTab::initExternal);
         modEventBus.addListener(InitNetwork::init);

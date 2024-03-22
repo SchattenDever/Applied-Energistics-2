@@ -3,6 +3,7 @@ package appeng.client.guidebook.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -207,9 +208,8 @@ public interface RenderContext {
         renderItem(stack, x, y, 0, width, height);
     }
 
-    default void renderFluid(Fluid fluid, @Nullable CompoundTag tag, int x, int y, int z, int width, int height) {
-        var key = AEFluidKey.of(fluid, tag);
-        FluidBlitter.create(key)
+    default void renderFluid(FluidStack stack, int x, int y, int z, int width, int height) {
+        FluidBlitter.create(stack)
                 .dest(x, y, width, height)
                 .blit(guiGraphics());
     }
