@@ -23,25 +23,26 @@ import java.util.Locale;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleOptions.Deserializer;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
-public class EnergyParticleData implements ParticleOptions {
+public record EnergyParticleData(boolean forItem, Direction direction) implements ParticleOptions {
+    public static final StreamCodec<FriendlyByteBuf, EnergyParticleData> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.BOOL,
+            EnergyParticleData::forItem,
+            Direction.STREAM_CODEC,
+            EnergyParticleData::direction,
+            EnergyParticleData::new
+    );
 
-    public static final EnergyParticleData FOR_BLOCK = new EnergyParticleData(false, null);
-
-    public final boolean forItem;
-
-    public final Direction direction;
-
-    public EnergyParticleData(boolean forItem, Direction direction) {
-        this.forItem = forItem;
-        this.direction = direction;
-    }
+    public static final EnergyParticleData FOR_BLOCK = new EnergyParticleData(false, Direction.UP);
 
     public static final Deserializer<EnergyParticleData> DESERIALIZER = new Deserializer<EnergyParticleData>() {
         @Override
@@ -54,29 +55,16 @@ public class EnergyParticleData implements ParticleOptions {
             return new EnergyParticleData(forItem, direction);
         }
 
-        @Override
-        public EnergyParticleData fromNetwork(ParticleType<EnergyParticleData> particleTypeIn, FriendlyByteBuf buffer) {
-            boolean forItem = buffer.readBoolean();
-            Direction direction = Direction.values()[buffer.readByte()];
-            return new EnergyParticleData(forItem, direction);
-        }
     };
-
     @Override
     public ParticleType<?> getType() {
         return ParticleTypes.ENERGY;
     }
 
-    @Override
-    public void writeToNetwork(FriendlyByteBuf buffer) {
-        buffer.writeBoolean(forItem);
-        buffer.writeByte((byte) direction.ordinal());
-    }
 
     @Override
     public String writeToString(HolderLookup.Provider provider) {
         return String.format(Locale.ROOT, "%s %s", forItem ? "true" : "false",
                 direction.name().toLowerCase(Locale.ROOT));
     }
-
 }

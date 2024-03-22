@@ -126,7 +126,7 @@ public class ChargerBlock extends AEBaseEntityBlock<ChargerBlockEntity> {
 
                 if (AppEngClient.instance().shouldAddParticles(r)) {
                     Minecraft.getInstance().particleEngine.createParticle(
-                            new LightningArcParticleData(new Vec3(target)),
+                            new LightningArcParticleData(target),
                             origin.x(),
                             origin.y(),
                             origin.z(),
