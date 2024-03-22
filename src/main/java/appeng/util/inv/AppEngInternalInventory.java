@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 import com.google.common.base.Preconditions;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -150,7 +151,7 @@ public class AppEngInternalInventory extends BaseInternalInventory {
         return true;
     }
 
-    public void writeToNBT(CompoundTag data, String name) {
+    public void writeToNBT(CompoundTag data, String name, HolderLookup.Provider registries) {
         if (isEmpty()) {
             data.remove(name);
             return;
@@ -162,13 +163,13 @@ public class AppEngInternalInventory extends BaseInternalInventory {
             if (!stack.isEmpty()) {
                 CompoundTag itemTag = new CompoundTag();
                 itemTag.putInt("Slot", i);
-                items.add(stack.save(itemTag));
+                items.add(stack.save(registries, itemTag));
             }
         }
         data.put(name, items);
     }
 
-    public void readFromNBT(CompoundTag data, String name) {
+    public void readFromNBT(CompoundTag data, String name, HolderLookup.Provider registries) {
         if (data.contains(name, Tag.TAG_LIST)) {
             var tagList = data.getList(name, Tag.TAG_COMPOUND);
             for (var itemTag : tagList) {
@@ -176,7 +177,7 @@ public class AppEngInternalInventory extends BaseInternalInventory {
                 int slot = itemCompound.getInt("Slot");
 
                 if (slot >= 0 && slot < stacks.size()) {
-                    stacks.set(slot, ItemStack.of(itemCompound));
+                    stacks.set(slot, ItemStack.parseOptional(registries, itemCompound));
                 }
             }
         }

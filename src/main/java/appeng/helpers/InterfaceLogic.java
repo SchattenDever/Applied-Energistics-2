@@ -24,6 +24,7 @@ import java.util.OptionalInt;
 
 import com.google.common.collect.ImmutableSet;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Direction;
@@ -145,21 +146,21 @@ public class InterfaceLogic implements ICraftingRequester, IUpgradeableObject, I
         this.notifyNeighbors();
     }
 
-    public void writeToNBT(CompoundTag tag) {
-        this.config.writeToChildTag(tag, "config");
-        this.storage.writeToChildTag(tag, "storage");
-        this.upgrades.writeToNBT(tag, "upgrades");
-        this.cm.writeToNBT(tag);
+    public void writeToNBT(CompoundTag tag, HolderLookup.Provider registries) {
+        this.config.writeToChildTag(tag, "config", registries);
+        this.storage.writeToChildTag(tag, "storage", registries);
+        this.upgrades.writeToNBT(tag, "upgrades", registries);
+        this.cm.writeToNBT(tag, registries);
         this.craftingTracker.writeToNBT(tag);
         tag.putInt("priority", this.priority);
     }
 
-    public void readFromNBT(CompoundTag tag) {
+    public void readFromNBT(CompoundTag tag, HolderLookup.Provider registries) {
         this.craftingTracker.readFromNBT(tag);
-        this.upgrades.readFromNBT(tag, "upgrades");
-        this.config.readFromChildTag(tag, "config");
-        this.storage.readFromChildTag(tag, "storage");
-        this.cm.readFromNBT(tag);
+        this.upgrades.readFromNBT(tag, "upgrades", registries);
+        this.config.readFromChildTag(tag, "config", registries);
+        this.storage.readFromChildTag(tag, "storage", registries);
+        this.cm.readFromNBT(tag, registries);
         this.readConfig();
         this.priority = tag.getInt("priority");
     }

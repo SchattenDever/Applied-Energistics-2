@@ -19,6 +19,7 @@
 package appeng.blockentity.misc;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -78,16 +79,16 @@ public class CondenserBlockEntity extends AEBaseInvBlockEntity implements IConfi
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
-        this.cm.writeToNBT(data);
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
+        this.cm.writeToNBT(data, registries);
         data.putDouble("storedPower", this.getStoredPower());
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
-        this.cm.readFromNBT(data);
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
+        this.cm.readFromNBT(data, registries);
         this.setStoredPower(data.getDouble("storedPower"));
     }
 

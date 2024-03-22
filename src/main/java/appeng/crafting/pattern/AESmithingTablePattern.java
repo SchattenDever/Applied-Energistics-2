@@ -297,10 +297,10 @@ public class AESmithingTablePattern implements IPatternDetails, IMolecularAssemb
             TooltipFlag flags) {
         var tooltip = new PatternDetailsTooltip(PatternDetailsTooltip.OUTPUT_TEXT_CRAFTS);
 
-        PatternNbtUtils.readKeyFaultTolerant(tag, NBT_TEMPLATE).ifPresent(tooltip::addInput);
-        PatternNbtUtils.readKeyFaultTolerant(tag, NBT_BASE).ifPresent(tooltip::addInput);
-        PatternNbtUtils.readKeyFaultTolerant(tag, NBT_ADDITION).ifPresent(tooltip::addInput);
-        PatternNbtUtils.readKeyFaultTolerant(tag, NBT_OUTPUT).ifPresent(tooltip::addOutput);
+        PatternNbtUtils.readKeyFaultTolerant(tag, NBT_TEMPLATE, level.registryAccess()).ifPresent(tooltip::addInput);
+        PatternNbtUtils.readKeyFaultTolerant(tag, NBT_BASE, level.registryAccess()).ifPresent(tooltip::addInput);
+        PatternNbtUtils.readKeyFaultTolerant(tag, NBT_ADDITION, level.registryAccess()).ifPresent(tooltip::addInput);
+        PatternNbtUtils.readKeyFaultTolerant(tag, NBT_OUTPUT, level.registryAccess()).ifPresent(tooltip::addOutput);
         if (PatternNbtUtils.getBoolean(tag, NBT_SUBSITUTE, false)) {
             tooltip.addProperty(GuiText.PatternTooltipSubstitutions.text());
         }

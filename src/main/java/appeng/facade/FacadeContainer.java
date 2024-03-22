@@ -21,6 +21,7 @@ package appeng.facade;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
+import net.minecraft.core.HolderLookup;
 import org.apache.commons.lang3.StringUtils;
 
 import net.minecraft.core.Direction;
@@ -86,7 +87,7 @@ public class FacadeContainer implements IFacadeContainer {
     }
 
     @Override
-    public void readFromNBT(CompoundTag c) {
+    public void readFromNBT(CompoundTag c, HolderLookup.Provider registries) {
         for (var side : Direction.values()) {
             this.storage.removeFacade(side);
 
@@ -103,7 +104,7 @@ public class FacadeContainer implements IFacadeContainer {
     }
 
     @Override
-    public void writeToNBT(CompoundTag c) {
+    public void writeToNBT(CompoundTag c, HolderLookup.Provider registries) {
         for (var side : Direction.values()) {
             if (this.storage.getFacade(side) != null) {
                 var data = new CompoundTag();

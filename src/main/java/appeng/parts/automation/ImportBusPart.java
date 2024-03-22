@@ -18,6 +18,7 @@
 
 package appeng.parts.automation;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
@@ -99,14 +100,14 @@ public class ImportBusPart extends IOBusPart implements KeyTypeSelectionHost {
     }
 
     @Override
-    public void readFromNBT(CompoundTag extra) {
-        super.readFromNBT(extra);
-        keyTypeSelection.readFromNBT(extra);
+    public void readFromNBT(CompoundTag extra, HolderLookup.Provider registries) {
+        super.readFromNBT(extra, registries);
+        keyTypeSelection.readFromNBT(extra, registries);
     }
 
     @Override
-    public void writeToNBT(CompoundTag extra) {
-        super.writeToNBT(extra);
+    public void writeToNBT(CompoundTag extra, HolderLookup.Provider registries) {
+        super.writeToNBT(extra, registries);
         keyTypeSelection.writeToNBT(extra);
     }
 

@@ -20,6 +20,7 @@ package appeng.blockentity.storage;
 
 import java.util.Objects;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -398,10 +399,10 @@ public class ChestBlockEntity extends AENetworkPowerBlockEntity
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
-        this.config.readFromNBT(data);
-        this.keyTypeSelection.readFromNBT(data);
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
+        this.config.readFromNBT(data, registries);
+        this.keyTypeSelection.readFromNBT(data, registries);
         this.priority = data.getInt("priority");
         if (data.contains("paintedColor")) {
             this.paintedColor = AEColor.values()[data.getByte("paintedColor")];
@@ -409,9 +410,9 @@ public class ChestBlockEntity extends AENetworkPowerBlockEntity
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
-        this.config.writeToNBT(data);
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
+        this.config.writeToNBT(data, registries);
         this.keyTypeSelection.writeToNBT(data);
         data.putInt("priority", this.priority);
         data.putByte("paintedColor", (byte) this.paintedColor.ordinal());

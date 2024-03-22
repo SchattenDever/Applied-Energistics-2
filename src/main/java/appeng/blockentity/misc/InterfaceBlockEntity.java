@@ -20,6 +20,7 @@ package appeng.blockentity.misc;
 
 import java.util.List;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -91,15 +92,15 @@ public class InterfaceBlockEntity extends AENetworkBlockEntity
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
-        this.logic.writeToNBT(data);
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
+        this.logic.writeToNBT(data, registries);
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
-        this.logic.readFromNBT(data);
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
+        this.logic.readFromNBT(data, registries);
     }
 
     @Override

@@ -79,7 +79,7 @@ public class WrappedGenericStack extends AEBaseItem {
             return null;
         }
 
-        return AEKey.fromTagGeneric(tag);
+        return AEKey.fromTagGeneric(tag, tag);
     }
 
     public long unwrapAmount(ItemStack stack) {

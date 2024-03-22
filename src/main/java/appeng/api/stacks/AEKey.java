@@ -2,13 +2,17 @@ package appeng.api.stacks;
 
 import java.util.List;
 
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.ResourceLocationException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -33,6 +37,54 @@ import appeng.core.AELog;
  */
 public abstract class AEKey {
 
+    public static final StreamCodec<RegistryFriendlyByteBuf, AEKey> STREAM_CODEC = StreamCodec.of(
+            AEKey::writeKey,
+            AEKey::readKey
+    );
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, AEKey> OPTIONAL_STREAM_CODEC = StreamCodec.of(
+            AEKey::writeOptionalKey,
+            AEKey::readOptionalKey
+    );
+
+    /**
+     * Writes a generic, nullable key to the given buffer.
+     */
+    public static void writeOptionalKey(RegistryFriendlyByteBuf buffer, @Nullable AEKey key) {
+        buffer.writeBoolean(key != null);
+        if (key != null) {
+            writeKey(buffer, key);
+        }
+    }
+
+    public static void writeKey(RegistryFriendlyByteBuf buffer, AEKey key) {
+        var id = key.getType().getRawId();
+        buffer.writeVarInt(id);
+        key.writeToPacket(buffer);
+    }
+
+    /**
+     * Tries reading a key written using {@link #writeOptionalKey}.
+     */
+    @Nullable
+    public static AEKey readOptionalKey(RegistryFriendlyByteBuf buffer) {
+        if (!buffer.readBoolean()) {
+            return null;
+        }
+        return readKey(buffer);
+    }
+
+    @Nullable
+    public static AEKey readKey(RegistryFriendlyByteBuf buffer) {
+        var id = buffer.readVarInt();
+        var type = AEKeyType.fromRawId(id);
+        if (type == null) {
+            AELog.error("Received unknown key space id %d", id);
+            return null;
+        }
+        return type.readFromPacket(buffer);
+    }
+
     /**
      * The display name, which is used to sort by name in client terminal. Lazily initialized to avoid unnecessary work
      * on the server. Volatile ensures that this cache is thread-safe (but can be initialized multiple times).
@@ -40,7 +92,7 @@ public abstract class AEKey {
     private volatile Component cachedDisplayName;
 
     @Nullable
-    public static AEKey fromTagGeneric(CompoundTag tag) {
+    public static AEKey fromTagGeneric(HolderLookup.Provider provider, CompoundTag tag) {
         // Handle malformed tags where the channel is missing
         var channelId = tag.getString("#c");
         if (channelId.isEmpty()) {
@@ -57,53 +109,15 @@ public abstract class AEKey {
             return null;
         }
 
-        return channel.loadKeyFromTag(tag);
+        return channel.loadKeyFromTag(provider, tag);
     }
 
     /**
-     * Writes a generic, nullable key to the given buffer.
-     */
-    public static void writeOptionalKey(FriendlyByteBuf buffer, @Nullable AEKey key) {
-        buffer.writeBoolean(key != null);
-        if (key != null) {
-            writeKey(buffer, key);
-        }
-    }
-
-    public static void writeKey(FriendlyByteBuf buffer, AEKey key) {
-        var id = key.getType().getRawId();
-        buffer.writeVarInt(id);
-        key.writeToPacket(buffer);
-    }
-
-    /**
-     * Tries reading a key written using {@link #writeOptionalKey}.
-     */
-    @Nullable
-    public static AEKey readOptionalKey(FriendlyByteBuf buffer) {
-        if (!buffer.readBoolean()) {
-            return null;
-        }
-        return readKey(buffer);
-    }
-
-    @Nullable
-    public static AEKey readKey(FriendlyByteBuf buffer) {
-        var id = buffer.readVarInt();
-        var type = AEKeyType.fromRawId(id);
-        if (type == null) {
-            AELog.error("Received unknown key space id %d", id);
-            return null;
-        }
-        return type.readFromPacket(buffer);
-    }
-
-    /**
-     * Same as {@link #toTag()}, but includes type information so that {@link #fromTagGeneric(CompoundTag)} can restore
+     * Same as {@link #toTag(HolderLookup.Provider)}, but includes type information so that {@link #fromTagGeneric(HolderLookup.Provider, CompoundTag)} can restore
      * this particular type of key withot knowing the actual type beforehand.
      */
-    public final CompoundTag toTagGeneric() {
-        var tag = toTag();
+    public final CompoundTag toTagGeneric(HolderLookup.Provider provider) {
+        var tag = toTag(provider);
         tag.putString("#c", getType().getId().toString());
         return tag;
     }
@@ -158,7 +172,7 @@ public abstract class AEKey {
      * Serialized keys MUST NOT contain keys that start with <code>#</code>, because this prefix can be used to add
      * additional data into the same tag as the key.
      */
-    public abstract CompoundTag toTag();
+    public abstract CompoundTag toTag(HolderLookup.Provider provider);
 
     public abstract Object getPrimaryKey();
 
@@ -228,7 +242,7 @@ public abstract class AEKey {
      */
     public abstract ResourceLocation getId();
 
-    public abstract void writeToPacket(FriendlyByteBuf data);
+    public abstract void writeToPacket(RegistryFriendlyByteBuf data);
 
     /**
      * Wraps a key in an ItemStack that can be unwrapped into a key later.

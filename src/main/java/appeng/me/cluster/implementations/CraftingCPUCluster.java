@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -258,9 +259,9 @@ public final class CraftingCPUCluster implements IAECluster, ICraftingCPU {
         return node != null && node.isActive();
     }
 
-    public void writeToNBT(CompoundTag data) {
-        this.craftingLogic.writeToNBT(data);
-        this.configManager.writeToNBT(data);
+    public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
+        this.craftingLogic.writeToNBT(data, registries);
+        this.configManager.writeToNBT(data, registries);
     }
 
     void done() {
@@ -269,16 +270,16 @@ public final class CraftingCPUCluster implements IAECluster, ICraftingCPU {
         core.setCoreBlock(true);
 
         if (core.getPreviousState() != null) {
-            this.readFromNBT(core.getPreviousState());
+            this.readFromNBT(core.getPreviousState(), core.getLevel().registryAccess());
             core.setPreviousState(null);
         }
 
         this.updateName();
     }
 
-    public void readFromNBT(CompoundTag data) {
-        this.craftingLogic.readFromNBT(data);
-        this.configManager.readFromNBT(data);
+    public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
+        this.craftingLogic.readFromNBT(data, registries);
+        this.configManager.readFromNBT(data, registries);
     }
 
     public void updateName() {

@@ -3,6 +3,7 @@ package appeng.util;
 import java.util.Collections;
 import java.util.Set;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 
 import appeng.api.config.Setting;
@@ -32,11 +33,11 @@ public final class NullConfigManager implements IConfigManager {
     }
 
     @Override
-    public void writeToNBT(CompoundTag destination) {
+    public void writeToNBT(CompoundTag destination, HolderLookup.Provider registries) {
     }
 
     @Override
-    public boolean readFromNBT(CompoundTag src) {
+    public boolean readFromNBT(CompoundTag src, HolderLookup.Provider registries) {
         return false;
     }
 }

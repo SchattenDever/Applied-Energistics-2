@@ -256,7 +256,7 @@ public class BasicCellInventory implements StorageCell {
 
         for (int i = 0; i < amounts.length; i++) {
             var amount = amounts[i];
-            AEKey key = AEKey.fromTagGeneric(tags.getCompound(i));
+            AEKey key = AEKey.fromTagGeneric( tags.getCompound(i));
 
             if (amount <= 0 || key == null) {
                 corruptedTag = true;

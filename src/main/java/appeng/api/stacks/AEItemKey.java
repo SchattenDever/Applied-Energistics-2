@@ -5,6 +5,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.WeakHashMap;
 
+import com.google.common.base.Preconditions;
+import it.unimi.dsi.fastutil.chars.CharDoubleMutablePair;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.util.datafix.fixes.ItemStackSpawnEggFix;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,44 +38,17 @@ import appeng.core.AELog;
 public final class AEItemKey extends AEKey {
     private static final Logger LOG = LoggerFactory.getLogger(AEItemKey.class);
 
-    @Nullable
-    private static CompoundTag serializeStackCaps(ItemStack stack) {
-        try {
-            var caps = stack.serializeAttachments();
-            // Ensure stacks with no serializable cap providers are treated the same as stacks with no caps!
-            return caps == null || caps.isEmpty() ? null : caps;
-        } catch (Throwable ex) {
-            throw new RuntimeException("Failed to call serializeCaps", ex);
-        }
-    }
-
-    private final Item item;
-    private final InternedTag internedTag;
-    private final InternedTag internedCaps;
+    private final ItemStack stack;
     private final int hashCode;
-    private final int cachedDamage;
-    /**
-     * A lazily initialized itemstack used for display and ingredient testing purposes. This should never be modified
-     * and will always have amount 1.
-     */
-    @Nullable
-    private ItemStack readOnlyStack;
+    private final int maxStackSize;
+    private final int damage;
 
-    /**
-     * Max stack size cache, or {@code -1} if not initialized.
-     */
-    private int maxStackSize = -1;
-
-    private AEItemKey(Item item, InternedTag internedTag, InternedTag internedCaps) {
-        this.item = item;
-        this.internedTag = internedTag;
-        this.internedCaps = internedCaps;
-        this.hashCode = Objects.hash(item, internedTag, internedCaps);
-        if (internedTag.tag != null && internedTag.tag.get("Damage") instanceof NumericTag numericTag) {
-            this.cachedDamage = numericTag.getAsInt();
-        } else {
-            this.cachedDamage = 0;
-        }
+    private AEItemKey(ItemStack stack) {
+        Preconditions.checkArgument(!stack.isEmpty(), "stack is empty");
+        this.stack = stack;
+        this.hashCode = ItemStack.hashItemAndComponents(stack);
+        this.maxStackSize = stack.getMaxStackSize();
+        this.damage = stack.getDamageValue();
     }
 
     @Nullable
@@ -74,10 +56,8 @@ public final class AEItemKey extends AEKey {
         if (stack.isEmpty()) {
             return null;
         }
-        var ret = of(stack.getItem(), stack.getTag(), serializeStackCaps(stack));
-        // Cache max stack size since we already have an ItemStack.
-        ret.maxStackSize = stack.getMaxStackSize();
-        return ret;
+
+        return new AEItemKey(stack.copy());
     }
 
     public static boolean matches(AEKey what, ItemStack itemStack) {
@@ -99,7 +79,7 @@ public final class AEItemKey extends AEKey {
 
     @Override
     public AEItemKey dropSecondary() {
-        return of(item, null);
+        return of(stack.getItem().getDefaultInstance());
     }
 
     @Override
@@ -109,7 +89,8 @@ public final class AEItemKey extends AEKey {
         if (o == null || getClass() != o.getClass())
             return false;
         AEItemKey aeItemKey = (AEItemKey) o;
-        return item == aeItemKey.item && internedTag == aeItemKey.internedTag && internedCaps == aeItemKey.internedCaps;
+        // The hash code comparison is a fast-fail cheap check
+        return this.hashCode == aeItemKey.hashCode && ItemStack.isSameItemSameComponents(stack, aeItemKey.stack);
     }
 
     @Override
@@ -118,21 +99,11 @@ public final class AEItemKey extends AEKey {
     }
 
     public static AEItemKey of(ItemLike item) {
-        return of(item, null);
-    }
-
-    public static AEItemKey of(ItemLike item, @Nullable CompoundTag tag) {
-        return of(item, tag, null);
-    }
-
-    private static AEItemKey of(ItemLike item, @Nullable CompoundTag tag, @Nullable CompoundTag caps) {
-        return new AEItemKey(item.asItem(), InternedTag.of(tag, false), InternedTag.of(caps, false));
+        return of(item.asItem().getDefaultInstance());
     }
 
     public boolean matches(ItemStack stack) {
-        // TODO: remove or optimize cap check if it becomes too slow >:-(
-        return !stack.isEmpty() && stack.is(item) && Objects.equals(stack.getTag(), internedTag.tag)
-                && Objects.equals(serializeStackCaps(stack), internedCaps.tag);
+        return !stack.isEmpty() && ItemStack.isSameItemSameComponents(this.stack, stack);
     }
 
     public boolean matches(Ingredient ingredient) {
@@ -143,17 +114,7 @@ public final class AEItemKey extends AEKey {
      * @return The ItemStack represented by this key. <strong>NEVER MUTATE THIS</strong>
      */
     public ItemStack getReadOnlyStack() {
-        if (readOnlyStack == null) {
-            readOnlyStack = new ItemStack(item, 1, internedCaps.tag);
-            readOnlyStack.setTag(internedTag.tag);
-        } else {
-            if (readOnlyStack.isEmpty()) {
-                LOG.error("Something destroyed the read-only itemstack of {}", this);
-                readOnlyStack = null;
-                return getReadOnlyStack();
-            }
-        }
-        return readOnlyStack;
+        return stack;
     }
 
     public ItemStack toStack() {
@@ -165,38 +126,17 @@ public final class AEItemKey extends AEKey {
             return ItemStack.EMPTY;
         }
 
-        var result = new ItemStack(item, count, internedCaps.tag);
-        result.setTag(copyTag());
-        return result;
+        return stack.copyWithCount(count);
     }
 
     public Item getItem() {
-        return item;
+        return stack.getItem();
     }
 
     @Nullable
-    public static AEItemKey fromTag(CompoundTag tag) {
+    public static AEItemKey fromTag(HolderLookup.Provider provider, CompoundTag tag) {
         try {
-            var item = BuiltInRegistries.ITEM.getOptional(new ResourceLocation(tag.getString("id")))
-                    .orElseThrow(() -> new IllegalArgumentException("Unknown item id."));
-            var extraTag = tag.contains("tag") ? tag.getCompound("tag") : null;
-            var extraCaps = tag.contains("caps") ? tag.getCompound("caps") : null;
-
-            // Sanitize caps since we'll be deserializing them over and over
-            // If there was a non backwards compatible change to a modded item (i.e. it lost its cap on an item)
-            // This will trigger continuous error logs on every call to toStack(), killing performance
-            if (extraCaps != null) {
-                var stack = new ItemStack(item, 1, extraCaps);
-                var sanitizedCaps = stack.serializeAttachments();
-                if (!Objects.equals(extraCaps, sanitizedCaps)) {
-                    LOG.info("Sanitized item attachments for {} from {} -> {}", item.asItem(),
-                            extraCaps, sanitizedCaps);
-                }
-
-                extraCaps = sanitizedCaps;
-            }
-
-            return of(item, extraTag, extraCaps);
+            return of(ItemStack.parseOptional(provider, tag));
         } catch (Exception e) {
             AELog.debug("Tried to load an invalid item key from NBT: %s", tag, e);
             return null;
@@ -204,23 +144,15 @@ public final class AEItemKey extends AEKey {
     }
 
     @Override
-    public CompoundTag toTag() {
+    public CompoundTag toTag(HolderLookup.Provider provider) {
         CompoundTag result = new CompoundTag();
-        result.putString("id", BuiltInRegistries.ITEM.getKey(item).toString());
-
-        if (internedTag.tag != null) {
-            result.put("tag", internedTag.tag.copy());
-        }
-        if (internedCaps.tag != null) {
-            result.put("caps", internedCaps.tag.copy());
-        }
-
+        stack.save(provider, result);
         return result;
     }
 
     @Override
     public Object getPrimaryKey() {
-        return item;
+        return stack.getItem();
     }
 
     /**
@@ -228,7 +160,7 @@ public final class AEItemKey extends AEKey {
      */
     @Override
     public int getFuzzySearchValue() {
-        return this.cachedDamage;
+        return this.damage;
     }
 
     /**
@@ -241,24 +173,7 @@ public final class AEItemKey extends AEKey {
 
     @Override
     public ResourceLocation getId() {
-        return BuiltInRegistries.ITEM.getKey(item);
-    }
-
-    /**
-     * @return <strong>NEVER MODIFY THE RETURNED TAG</strong>
-     */
-    @Nullable
-    public CompoundTag getTag() {
-        return internedTag.tag;
-    }
-
-    @Nullable
-    public CompoundTag copyTag() {
-        return internedTag.tag != null ? internedTag.tag.copy() : null;
-    }
-
-    public boolean hasTag() {
-        return internedTag.tag != null;
+        return BuiltInRegistries.ITEM.getKey(stack.getItem());
     }
 
     @Override
@@ -270,7 +185,7 @@ public final class AEItemKey extends AEKey {
     public void addDrops(long amount, List<ItemStack> drops, Level level, BlockPos pos) {
         while (amount > 0) {
             if (drops.size() > 1000) {
-                AELog.warn("Tried dropping an excessive amount of items, ignoring %s %ss", amount, item);
+                AELog.warn("Tried dropping an excessive amount of items, ignoring %s %ss", amount, stack.getItem());
                 break;
             }
 
@@ -289,52 +204,36 @@ public final class AEItemKey extends AEKey {
     @Override
     public boolean isTagged(TagKey<?> tag) {
         // This will just return false for incorrectly cast tags
-        return item.builtInRegistryHolder().is((TagKey<Item>) tag);
+        return stack.is((TagKey<Item>) tag);
     }
 
     /**
      * @return True if the item represented by this key is damaged.
      */
     public boolean isDamaged() {
-        return cachedDamage > 0;
+        return damage > 0;
     }
 
     public int getMaxStackSize() {
-        int ret = maxStackSize;
-
-        if (ret == -1) {
-            maxStackSize = ret = getReadOnlyStack().getMaxStackSize();
-        }
-
-        return ret;
+        return maxStackSize;
     }
 
     @Override
-    public void writeToPacket(FriendlyByteBuf data) {
-        data.writeVarInt(Item.getId(item));
-        CompoundTag compoundTag = null;
-        if (item.canBeDepleted() || item.shouldOverrideMultiplayerNbt()) {
-            compoundTag = internedTag.tag;
-        }
-        data.writeNbt(compoundTag);
-        data.writeNbt(internedCaps.tag);
+    public void writeToPacket(RegistryFriendlyByteBuf data) {
+        ItemStack.STREAM_CODEC.encode(data, stack);
     }
 
-    public static AEItemKey fromPacket(FriendlyByteBuf data) {
-        int i = data.readVarInt();
-        var item = Item.byId(i);
-        var compoundTag = data.readNbt();
-        var attachedCapsData = data.readNbt();
-        return new AEItemKey(item, InternedTag.of(compoundTag, true),
-                InternedTag.of(attachedCapsData, true));
+    public static AEItemKey fromPacket(RegistryFriendlyByteBuf data) {
+        var stack = ItemStack.STREAM_CODEC.decode(data);
+        return new AEItemKey(stack);
     }
 
     @Override
     public String toString() {
-        var id = BuiltInRegistries.ITEM.getKey(item);
+        var id = BuiltInRegistries.ITEM.getKey(stack.getItem());
         String idString = id != BuiltInRegistries.ITEM.getDefaultKey() ? id.toString()
-                : item.getClass().getName() + "(unregistered)";
-        return internedTag.tag == null ? idString : idString + " (+tag)";
+                : stack.getItem().getClass().getName() + "(unregistered)";
+        return stack.getComponents().isEmpty() ? idString : idString + " (+components)";
     }
 
     private static final class InternedTag {

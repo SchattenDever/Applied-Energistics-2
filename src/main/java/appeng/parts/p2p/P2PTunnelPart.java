@@ -21,6 +21,7 @@ package appeng.parts.p2p;
 import java.util.List;
 import java.util.stream.Stream;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
@@ -106,15 +107,15 @@ public abstract class P2PTunnelPart<T extends P2PTunnelPart<T>> extends AEBasePa
     }
 
     @Override
-    public void readFromNBT(CompoundTag data) {
-        super.readFromNBT(data);
+    public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.readFromNBT(data, registries);
         this.setOutput(data.getBoolean("output"));
         this.freq = data.getShort("freq");
     }
 
     @Override
-    public void writeToNBT(CompoundTag data) {
-        super.writeToNBT(data);
+    public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.writeToNBT(data, registries);
         data.putBoolean("output", this.isOutput());
         data.putShort("freq", this.getFrequency());
     }

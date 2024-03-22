@@ -21,6 +21,7 @@ package appeng.parts.crafting;
 import java.util.EnumSet;
 import java.util.List;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -100,15 +101,15 @@ public class PatternProviderPart extends AEBasePart implements PatternProviderLo
     }
 
     @Override
-    public void readFromNBT(CompoundTag data) {
-        super.readFromNBT(data);
-        this.logic.readFromNBT(data);
+    public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.readFromNBT(data, registries);
+        this.logic.readFromNBT(data, registries);
     }
 
     @Override
-    public void writeToNBT(CompoundTag data) {
-        super.writeToNBT(data);
-        this.logic.writeToNBT(data);
+    public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.writeToNBT(data, registries);
+        this.logic.writeToNBT(data, registries);
     }
 
     @Override

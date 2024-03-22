@@ -21,9 +21,10 @@ package appeng.api.stacks;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
@@ -51,15 +52,15 @@ final class AEFluidKeys extends AEKeyType {
     }
 
     @Override
-    public AEFluidKey readFromPacket(FriendlyByteBuf input) {
+    public AEFluidKey readFromPacket(RegistryFriendlyByteBuf input) {
         Objects.requireNonNull(input);
 
         return AEFluidKey.fromPacket(input);
     }
 
     @Override
-    public AEFluidKey loadKeyFromTag(CompoundTag tag) {
-        return AEFluidKey.fromTag(tag);
+    public AEFluidKey loadKeyFromTag(HolderLookup.Provider provider, CompoundTag tag) {
+        return AEFluidKey.fromTag(provider, tag);
     }
 
     @Override

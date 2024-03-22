@@ -18,6 +18,7 @@
 
 package appeng.blockentity.networking;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -141,15 +142,15 @@ public class EnergyCellBlockEntity extends AENetworkBlockEntity implements IAEPo
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
         data.putDouble("internalCurrentPower", this.stored.getAmount());
         data.putBoolean("neighborChangePending", this.neighborChangePending);
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
         this.stored.setStored(data.getDouble("internalCurrentPower"));
         this.neighborChangePending = data.getBoolean("neighborChangePending");
     }

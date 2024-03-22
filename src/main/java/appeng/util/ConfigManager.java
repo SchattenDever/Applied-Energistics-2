@@ -22,6 +22,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,9 +85,10 @@ public final class ConfigManager implements IConfigManager {
      * save all settings using config manager.
      *
      * @param tagCompound to be written to compound
+     * @param registries
      */
     @Override
-    public void writeToNBT(CompoundTag tagCompound) {
+    public void writeToNBT(CompoundTag tagCompound, HolderLookup.Provider registries) {
         for (var entry : this.settings.entrySet()) {
             tagCompound.putString(entry.getKey().getName(), this.settings.get(entry.getKey()).toString());
         }
@@ -96,9 +98,10 @@ public final class ConfigManager implements IConfigManager {
      * read all settings using config manager.
      *
      * @param tagCompound to be read from compound
+     * @param registries
      */
     @Override
-    public boolean readFromNBT(CompoundTag tagCompound) {
+    public boolean readFromNBT(CompoundTag tagCompound, HolderLookup.Provider registries) {
         boolean anythingRead = false;
         for (var setting : this.settings.keySet()) {
             if (tagCompound.contains(setting.getName(), Tag.TAG_STRING)) {

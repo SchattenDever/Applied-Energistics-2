@@ -2,10 +2,13 @@ package appeng.api.stacks;
 
 import java.util.Objects;
 
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -15,12 +18,17 @@ import appeng.items.misc.WrappedGenericStack;
  * Represents some amount of some generic resource that AE can store or handle in crafting.
  */
 public record GenericStack(AEKey what, long amount) {
+    public static final StreamCodec<RegistryFriendlyByteBuf, GenericStack> STREAM_CODEC = StreamCodec.ofMember(
+            GenericStack::writeBuffer,
+            GenericStack::readBuffer
+    );
+
     public GenericStack {
         Objects.requireNonNull(what, "what");
     }
 
     @Nullable
-    public static GenericStack readBuffer(FriendlyByteBuf buffer) {
+    public static GenericStack readBuffer(RegistryFriendlyByteBuf buffer) {
         if (!buffer.readBoolean()) {
             return null;
         }
@@ -33,7 +41,7 @@ public record GenericStack(AEKey what, long amount) {
         return new GenericStack(what, buffer.readVarLong());
     }
 
-    public static void writeBuffer(@Nullable GenericStack stack, FriendlyByteBuf buffer) {
+    public static void writeBuffer(@Nullable GenericStack stack, RegistryFriendlyByteBuf buffer) {
         if (stack == null) {
             buffer.writeBoolean(false);
         } else {
@@ -45,22 +53,22 @@ public record GenericStack(AEKey what, long amount) {
     }
 
     @Nullable
-    public static GenericStack readTag(CompoundTag tag) {
+    public static GenericStack readTag(HolderLookup.Provider provider, CompoundTag tag) {
         if (tag.isEmpty()) {
             return null;
         }
-        var key = AEKey.fromTagGeneric(tag);
+        var key = AEKey.fromTagGeneric(provider, tag);
         if (key == null) {
             return null;
         }
         return new GenericStack(key, tag.getLong("#"));
     }
 
-    public static CompoundTag writeTag(@Nullable GenericStack stack) {
+    public static CompoundTag writeTag(HolderLookup.Provider provider, @Nullable GenericStack stack) {
         if (stack == null) {
             return new CompoundTag();
         }
-        var tag = stack.what.toTagGeneric();
+        var tag = stack.what.toTagGeneric(provider);
         tag.putLong("#", stack.amount);
         return tag;
     }

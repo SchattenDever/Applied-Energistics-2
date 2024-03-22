@@ -20,6 +20,7 @@ package appeng.parts.automation;
 
 import java.util.Set;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -130,18 +131,18 @@ public abstract class IOBusPart extends UpgradeablePart implements IGridTickable
     }
 
     @Override
-    public void readFromNBT(CompoundTag extra) {
-        super.readFromNBT(extra);
-        config.readFromChildTag(extra, "config");
+    public void readFromNBT(CompoundTag extra, HolderLookup.Provider registries) {
+        super.readFromNBT(extra, registries);
+        config.readFromChildTag(extra, "config", registries);
         // Ensure the filter is rebuilt
         filter = null;
         pendingPulse = isInPulseMode() && extra.getBoolean("pendingPulse");
     }
 
     @Override
-    public void writeToNBT(CompoundTag extra) {
-        super.writeToNBT(extra);
-        config.writeToChildTag(extra, "config");
+    public void writeToNBT(CompoundTag extra, HolderLookup.Provider registries) {
+        super.writeToNBT(extra, registries);
+        config.writeToChildTag(extra, "config", registries);
         if (isInPulseMode() && pendingPulse) {
             extra.putBoolean("pendingPulse", true);
         }

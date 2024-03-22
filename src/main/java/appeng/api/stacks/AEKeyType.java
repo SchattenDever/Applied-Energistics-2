@@ -28,11 +28,12 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
 
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -130,13 +131,13 @@ public abstract class AEKeyType {
      * Attempts to load a key of this type from the given packet buffer.
      */
     @Nullable
-    public abstract AEKey readFromPacket(FriendlyByteBuf input);
+    public abstract AEKey readFromPacket(RegistryFriendlyByteBuf input);
 
     /**
      * Attempts to load a key of this type from the given tag.
      */
     @Nullable
-    public abstract AEKey loadKeyFromTag(CompoundTag tag);
+    public abstract AEKey loadKeyFromTag(HolderLookup.Provider provider, CompoundTag tag);
 
     /**
      * Does this key belong to this storage channel.

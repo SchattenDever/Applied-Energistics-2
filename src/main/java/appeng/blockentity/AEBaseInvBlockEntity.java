@@ -20,6 +20,7 @@ package appeng.blockentity;
 
 import java.util.List;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -43,8 +44,8 @@ public abstract class AEBaseInvBlockEntity extends AEBaseBlockEntity implements 
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
         var inv = this.getInternalInventory();
         if (inv != InternalInventory.empty()) {
             var opt = data.getCompound("inv");
@@ -58,8 +59,8 @@ public abstract class AEBaseInvBlockEntity extends AEBaseBlockEntity implements 
     public abstract InternalInventory getInternalInventory();
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
         var inv = this.getInternalInventory();
         if (inv != InternalInventory.empty()) {
             final CompoundTag opt = new CompoundTag();

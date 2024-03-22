@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 
 import com.google.common.base.Preconditions;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
@@ -404,20 +405,20 @@ public class CraftingCpuLogic {
         }
     }
 
-    public void readFromNBT(CompoundTag data) {
-        this.inventory.readFromNBT(data.getList("inventory", 10));
+    public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
+        this.inventory.readFromNBT(data.getList("inventory", 10), registries);
         if (data.contains("job")) {
-            this.job = new ExecutingCraftingJob(data.getCompound("job"), this::postChange, this);
+            this.job = new ExecutingCraftingJob(data.getCompound("job"), registries, this::postChange, this);
             cluster.updateOutput(new GenericStack(job.finalOutput.what(), job.remainingAmount));
         } else {
             cluster.updateOutput(null);
         }
     }
 
-    public void writeToNBT(CompoundTag data) {
-        data.put("inventory", this.inventory.writeToNBT());
+    public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
+        data.put("inventory", this.inventory.writeToNBT(registries));
         if (this.job != null) {
-            data.put("job", this.job.writeToNBT());
+            data.put("job", this.job.writeToNBT(registries));
         }
     }
 

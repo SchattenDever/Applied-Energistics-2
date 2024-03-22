@@ -18,6 +18,7 @@
 
 package appeng.parts.automation;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -172,16 +173,16 @@ public abstract class AbstractLevelEmitterPart extends UpgradeablePart {
     }
 
     @Override
-    public void readFromNBT(CompoundTag data) {
-        super.readFromNBT(data);
+    public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.readFromNBT(data, registries);
         this.lastReportedValue = data.getLong("lastReportedValue");
         this.reportingValue = data.getLong("reportingValue");
         this.prevState = data.getBoolean("prevState");
     }
 
     @Override
-    public void writeToNBT(CompoundTag data) {
-        super.writeToNBT(data);
+    public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.writeToNBT(data, registries);
         data.putLong("lastReportedValue", this.lastReportedValue);
         data.putLong("reportingValue", this.reportingValue);
         data.putBoolean("prevState", this.prevState);

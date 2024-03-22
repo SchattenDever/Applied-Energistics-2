@@ -504,7 +504,7 @@ public class AECraftingPattern implements IPatternDetails, IMolecularAssemblerSu
         Objects.requireNonNull(sparseInputs, "sparseInputs");
         Objects.requireNonNull(output, "output");
 
-        tag.put(NBT_INPUTS, PatternNbtUtils.encodeItemStackList(sparseInputs));
+        tag.put(NBT_INPUTS, PatternNbtUtils.encodeItemStackList(sparseInputs ));
         tag.putBoolean(NBT_SUBSTITUTE, allowSubstitutes);
         tag.putBoolean(NBT_SUBSTITUTE_FLUIDS, allowFluidSubstitutes);
         tag.put(NBT_OUTPUTS, output.save(new CompoundTag()));
@@ -535,8 +535,8 @@ public class AECraftingPattern implements IPatternDetails, IMolecularAssemblerSu
             @Nullable Exception cause, TooltipFlag flags) {
         var tooltip = new PatternDetailsTooltip(PatternDetailsTooltip.OUTPUT_TEXT_CRAFTS);
 
-        PatternNbtUtils.readItemStackListFaultTolerant(tag, NBT_INPUTS, tooltip::addInput);
-        PatternNbtUtils.readItemStackFaultTolerant(tag, NBT_OUTPUTS).ifPresent(tooltip::addOutput);
+        PatternNbtUtils.readItemStackListFaultTolerant(tag, NBT_INPUTS, tooltip::addInput, level.registryAccess());
+        PatternNbtUtils.readItemStackFaultTolerant(tag, NBT_OUTPUTS, level.registryAccess()).ifPresent(tooltip::addOutput);
 
         if (PatternNbtUtils.getBoolean(tag, NBT_SUBSTITUTE, false)) {
             tooltip.addProperty(GuiText.PatternTooltipSubstitutions.text());

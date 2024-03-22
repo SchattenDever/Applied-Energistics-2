@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import com.google.common.base.Preconditions;
 import com.machinezoo.noexception.optional.OptionalBoolean;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
@@ -58,21 +59,21 @@ final class PatternNbtUtils {
         return Optional.empty();
     }
 
-    public static AEItemKey getRequiredItemKey(@Nullable CompoundTag tag, String name) {
+    public static AEItemKey getRequiredItemKey(@Nullable CompoundTag tag, String name, HolderLookup.Provider registries) {
         if (tag != null && tag.contains(name, Tag.TAG_COMPOUND)) {
-            return AEItemKey.fromTag(tag.getCompound(name));
+            return AEItemKey.fromTag(registries, tag.getCompound(name));
         }
         throw new IllegalArgumentException("Tag is missing required key " + name);
     }
 
-    public static ListTag encodeItemStackList(ItemStack[] stacks) {
+    public static ListTag encodeItemStackList(ItemStack[] stacks, HolderLookup.Provider registries) {
         ListTag tag = new ListTag();
         boolean foundStack = false;
         for (var stack : stacks) {
             if (stack.isEmpty()) {
                 tag.add(new CompoundTag());
             } else {
-                tag.add(stack.save(new CompoundTag()));
+                tag.add(stack.save(registries, new CompoundTag()));
                 foundStack = true;
             }
         }
@@ -84,9 +85,9 @@ final class PatternNbtUtils {
      * Attempts to read an ItemStack in a fault-tolerant way.
      */
     public static Optional<PatternDetailsTooltip.Entry> readItemStackFaultTolerant(@Nullable CompoundTag tag,
-            String name) {
+                                                                                   String name, HolderLookup.Provider registries) {
         if (tag != null) {
-            return readItemStackFaultTolerant(tag.get(name));
+            return readItemStackFaultTolerant(tag.get(name), registries);
         }
         return Optional.empty();
     }
@@ -94,7 +95,7 @@ final class PatternNbtUtils {
     /**
      * Attempts to read an ItemStack in a fault-tolerant way.
      */
-    public static Optional<PatternDetailsTooltip.Entry> readItemStackFaultTolerant(@Nullable Tag tag) {
+    public static Optional<PatternDetailsTooltip.Entry> readItemStackFaultTolerant(@Nullable Tag tag, HolderLookup.Provider registries) {
         if (!(tag instanceof CompoundTag compoundTag)) {
             return Optional.empty();
         }
@@ -103,7 +104,7 @@ final class PatternNbtUtils {
             return Optional.empty();
         }
 
-        var stack = GenericStack.fromItemStack(ItemStack.of(compoundTag));
+        var stack = GenericStack.fromItemStack(ItemStack.parseOptional(registries, compoundTag));
         if (stack != null) {
             return Optional.of(new PatternDetailsTooltip.ValidEntry(stack));
         }
@@ -125,23 +126,23 @@ final class PatternNbtUtils {
      * normally deserializing the list probably fails and tries to recover as much information as possible.
      */
     public static void readItemStackListFaultTolerant(@Nullable CompoundTag tag, String name,
-            Consumer<PatternDetailsTooltip.Entry> entryConsumer) {
+                                                      Consumer<PatternDetailsTooltip.Entry> entryConsumer, HolderLookup.Provider registries) {
         if (tag == null || !tag.contains(name, Tag.TAG_LIST)) {
             return;
         }
 
         var list = (ListTag) tag.get(name);
         for (var child : list) {
-            readItemStackFaultTolerant(child).ifPresent(entryConsumer);
+            readItemStackFaultTolerant(child, registries).ifPresent(entryConsumer);
         }
     }
 
     public static Optional<PatternDetailsTooltip.Entry> readKeyFaultTolerant(@Nullable CompoundTag tag,
-            String name) {
+                                                                             String name, HolderLookup.Provider registries) {
         // Try reading it normally first
         try {
             return Optional.of(new PatternDetailsTooltip.ValidEntry(
-                    getRequiredItemKey(tag, name),
+                    getRequiredItemKey(tag, name, registries),
                     1));
         } catch (Exception ignored) {
         }
@@ -159,7 +160,7 @@ final class PatternNbtUtils {
         return Optional.empty();
     }
 
-    public static GenericStack[] getRequiredGenericStackList(@Nullable CompoundTag tag, String name, int maxSize) {
+    public static GenericStack[] getRequiredGenericStackList(@Nullable CompoundTag tag, String name, int maxSize, HolderLookup.Provider registries) {
         Objects.requireNonNull(tag, "Pattern must have a tag.");
         if (!tag.contains(name, Tag.TAG_LIST)) {
             throw new IllegalArgumentException("Tag is missing required key " + name);
@@ -176,7 +177,7 @@ final class PatternNbtUtils {
             if (entry.isEmpty()) {
                 continue;
             }
-            var stack = GenericStack.readTag(entry);
+            var stack = GenericStack.readTag(registries, entry);
             if (stack == null) {
                 throw new IllegalArgumentException("Pattern references missing stack: " + entry);
             }
@@ -185,14 +186,14 @@ final class PatternNbtUtils {
         return result;
     }
 
-    public static Optional<PatternDetailsTooltip.Entry> readGenericStackFaultTolerant(@Nullable Tag tag) {
+    public static Optional<PatternDetailsTooltip.Entry> readGenericStackFaultTolerant(@Nullable Tag tag, HolderLookup.Provider registries) {
         if (!(tag instanceof CompoundTag compoundTag) || compoundTag.isEmpty()) {
             return Optional.empty();
         }
 
         // Try reading it normally first
         try {
-            var stack = GenericStack.readTag(compoundTag);
+            var stack = GenericStack.readTag(registries, compoundTag);
             if (stack != null) {
                 return Optional.of(new PatternDetailsTooltip.ValidEntry(stack));
             }
@@ -225,7 +226,8 @@ final class PatternNbtUtils {
     }
 
     public static void getGenericStackListFaultTolerant(@Nullable CompoundTag tag, String name,
-            Consumer<PatternDetailsTooltip.Entry> consumer) {
+                                                        Consumer<PatternDetailsTooltip.Entry> consumer,
+                                                        HolderLookup.Provider registries) {
         if (tag == null || !tag.contains(name, Tag.TAG_LIST)) {
             return;
         }
@@ -235,12 +237,12 @@ final class PatternNbtUtils {
         for (var child : listTag) {
             if (child instanceof CompoundTag compoundChild) {
                 if (!compoundChild.isEmpty()) {
-                    var stack = GenericStack.readTag(compoundChild);
+                    var stack = GenericStack.readTag(registries, compoundChild);
                     if (stack != null) {
                         consumer.accept(new PatternDetailsTooltip.ValidEntry(stack));
                     } else {
                         // Try recovery
-                        readGenericStackFaultTolerant(child).ifPresent(consumer);
+                        readGenericStackFaultTolerant(child, registries).ifPresent(consumer);
                     }
                 }
             }

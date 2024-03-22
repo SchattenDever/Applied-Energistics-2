@@ -20,6 +20,7 @@ package appeng.blockentity.misc;
 
 import java.util.List;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -123,9 +124,9 @@ public class VibrationChamberBlockEntity extends AENetworkInvBlockEntity impleme
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
-        this.upgrades.writeToNBT(data, "upgrades");
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
+        this.upgrades.writeToNBT(data, "upgrades", registries);
         data.putDouble("burnTime", this.getRemainingFuelTicks());
         data.putDouble("maxBurnTime", this.getFuelItemFuelTicks());
         // Save as percentage of max-speed
@@ -134,9 +135,9 @@ public class VibrationChamberBlockEntity extends AENetworkInvBlockEntity impleme
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
-        this.upgrades.readFromNBT(data, "upgrades");
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
+        this.upgrades.readFromNBT(data, "upgrades", registries);
         this.setRemainingFuelTicks(data.getDouble("burnTime"));
         this.setFuelItemFuelTicks(data.getDouble("maxBurnTime"));
         this.setCurrentFuelTicksPerTick(data.getInt("burnSpeed") * maxFuelTicksPerTick / 100.0);

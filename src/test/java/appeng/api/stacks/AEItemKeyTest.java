@@ -140,7 +140,7 @@ class AEItemKeyTest {
     class GenericTagSerialization {
         @Test
         void deserializeFromTagWithoutChannel() {
-            assertNull(AEKey.fromTagGeneric(new CompoundTag()));
+            assertNull(AEKey.fromTagGeneric(, new CompoundTag()));
         }
 
         @Test
@@ -148,7 +148,7 @@ class AEItemKeyTest {
             var tag = new CompoundTag();
             tag.putString("#c", "modid:doesnt_exist");
 
-            assertNull(AEKey.fromTagGeneric(tag));
+            assertNull(AEKey.fromTagGeneric(, tag));
         }
 
         @Test
@@ -156,7 +156,7 @@ class AEItemKeyTest {
             var tag = new CompoundTag();
             tag.putString("#c", "modid!!!!!doesnt_exist");
 
-            assertNull(AEKey.fromTagGeneric(tag));
+            assertNull(AEKey.fromTagGeneric(, tag));
         }
     }
 

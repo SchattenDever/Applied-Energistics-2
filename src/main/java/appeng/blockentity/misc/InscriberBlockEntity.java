@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -147,17 +148,17 @@ public class InscriberBlockEntity extends AENetworkPowerBlockEntity
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
-        this.upgrades.writeToNBT(data, "upgrades");
-        this.configManager.writeToNBT(data);
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
+        this.upgrades.writeToNBT(data, "upgrades", registries);
+        this.configManager.writeToNBT(data, registries);
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
-        this.upgrades.readFromNBT(data, "upgrades");
-        this.configManager.readFromNBT(data);
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
+        this.upgrades.readFromNBT(data, "upgrades", registries);
+        this.configManager.readFromNBT(data, registries);
 
         // Update stack tracker
         lastStacks.put(topItemHandler, topItemHandler.getStackInSlot(0));

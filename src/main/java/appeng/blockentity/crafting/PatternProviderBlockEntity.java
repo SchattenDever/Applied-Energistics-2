@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -109,14 +110,14 @@ public class PatternProviderBlockEntity extends AENetworkBlockEntity implements 
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
-        this.logic.writeToNBT(data);
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
+        this.logic.writeToNBT(data, registries);
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
 
         // Remove in 1.20.1+: Convert legacy NBT orientation to blockstate
         if (data.getBoolean("omniDirectional")) {
@@ -129,7 +130,7 @@ public class PatternProviderBlockEntity extends AENetworkBlockEntity implements 
             }
         }
 
-        this.logic.readFromNBT(data);
+        this.logic.readFromNBT(data, registries);
     }
 
     @Override

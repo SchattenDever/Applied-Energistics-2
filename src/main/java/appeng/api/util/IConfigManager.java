@@ -25,6 +25,7 @@ package appeng.api.util;
 
 import java.util.Set;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 
 import appeng.api.config.Setting;
@@ -80,14 +81,16 @@ public interface IConfigManager {
      * write all settings to the NBT Tag so they can be read later.
      *
      * @param destination to be written nbt tag
+     * @param registries
      */
-    void writeToNBT(CompoundTag destination);
+    void writeToNBT(CompoundTag destination, HolderLookup.Provider registries);
 
     /**
      * Only works after settings have been registered
      *
-     * @param src to be read nbt tag
+     * @param src        to be read nbt tag
+     * @param registries
      * @return true if any configuration was loaded from src
      */
-    boolean readFromNBT(CompoundTag src);
+    boolean readFromNBT(CompoundTag src, HolderLookup.Provider registries);
 }

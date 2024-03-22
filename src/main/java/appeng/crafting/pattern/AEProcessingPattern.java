@@ -23,6 +23,7 @@ import java.util.Objects;
 
 import com.google.common.base.Preconditions;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
@@ -148,8 +149,8 @@ public class AEProcessingPattern implements IPatternDetails {
             @Nullable Exception cause, TooltipFlag flags) {
         var tooltip = new PatternDetailsTooltip(PatternDetailsTooltip.OUTPUT_TEXT_PRODUCES);
 
-        PatternNbtUtils.getGenericStackListFaultTolerant(tag, NBT_INPUTS, tooltip::addInput);
-        PatternNbtUtils.getGenericStackListFaultTolerant(tag, NBT_OUTPUTS, tooltip::addOutput);
+        PatternNbtUtils.getGenericStackListFaultTolerant(tag, NBT_INPUTS, tooltip::addInput, level.registryAccess());
+        PatternNbtUtils.getGenericStackListFaultTolerant(tag, NBT_OUTPUTS, tooltip::addOutput, level.registryAccess());
 
         return tooltip;
     }
@@ -185,11 +186,11 @@ public class AEProcessingPattern implements IPatternDetails {
         }
     }
 
-    private static ListTag encodeStackList(GenericStack[] stacks) {
+    private static ListTag encodeStackList(GenericStack[] stacks, HolderLookup.Provider registries) {
         ListTag tag = new ListTag();
         boolean foundStack = false;
         for (var stack : stacks) {
-            tag.add(GenericStack.writeTag(stack));
+            tag.add(GenericStack.writeTag(registries, stack));
             if (stack != null && stack.amount() > 0) {
                 foundStack = true;
             }

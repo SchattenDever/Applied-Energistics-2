@@ -18,6 +18,7 @@
 
 package appeng.parts.reporting;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -79,14 +80,14 @@ public class PatternAccessTerminalPart extends AbstractDisplayPart implements IP
         return configManager;
     }
 
-    public void writeToNBT(CompoundTag tag) {
-        super.writeToNBT(tag);
-        configManager.writeToNBT(tag);
+    public void writeToNBT(CompoundTag tag, HolderLookup.Provider registries) {
+        super.writeToNBT(tag, registries);
+        configManager.writeToNBT(tag, registries);
     }
 
-    public void readFromNBT(CompoundTag tag) {
-        super.readFromNBT(tag);
-        configManager.readFromNBT(tag);
+    public void readFromNBT(CompoundTag tag, HolderLookup.Provider registries) {
+        super.readFromNBT(tag, registries);
+        configManager.readFromNBT(tag, registries);
     }
 
     @Override

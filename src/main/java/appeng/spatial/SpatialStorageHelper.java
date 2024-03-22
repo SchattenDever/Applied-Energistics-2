@@ -261,8 +261,7 @@ public class SpatialStorageHelper {
         @Override
         public void visit(BlockPos pos) {
             final BlockState state = this.dst.getBlockState(pos);
-            final Block blk = state.getBlock();
-            blk.neighborChanged(state, this.dst, pos, blk, pos, false);
+            state.handleNeighborChanged(this.dst, pos, state.getBlock(), pos, false);
         }
     }
 

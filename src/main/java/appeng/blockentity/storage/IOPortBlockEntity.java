@@ -20,6 +20,7 @@ package appeng.blockentity.storage;
 
 import java.util.List;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -110,18 +111,18 @@ public class IOPortBlockEntity extends AENetworkInvBlockEntity
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
-        this.manager.writeToNBT(data);
-        this.upgrades.writeToNBT(data, "upgrades");
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
+        this.manager.writeToNBT(data, registries);
+        this.upgrades.writeToNBT(data, "upgrades", registries);
         data.putInt("lastRedstoneState", this.lastRedstoneState.ordinal());
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
-        this.manager.readFromNBT(data);
-        this.upgrades.readFromNBT(data, "upgrades");
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
+        this.manager.readFromNBT(data, registries);
+        this.upgrades.readFromNBT(data, "upgrades", registries);
         if (data.contains("lastRedstoneState")) {
             this.lastRedstoneState = YesNo.values()[data.getInt("lastRedstoneState")];
         }

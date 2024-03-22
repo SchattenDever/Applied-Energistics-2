@@ -20,6 +20,7 @@ package appeng.parts.reporting;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -117,21 +118,21 @@ public abstract class AbstractMonitorPart extends AbstractDisplayPart
     }
 
     @Override
-    public void readFromNBT(CompoundTag data) {
-        super.readFromNBT(data);
+    public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.readFromNBT(data, registries);
 
         this.isLocked = data.getBoolean("isLocked");
 
         if (data.contains("configuredItem", Tag.TAG_COMPOUND)) {
-            this.configuredItem = AEKey.fromTagGeneric(data.getCompound("configuredItem"));
+            this.configuredItem = AEKey.fromTagGeneric(registries, data.getCompound("configuredItem"));
         } else {
             this.configuredItem = null;
         }
     }
 
     @Override
-    public void writeToNBT(CompoundTag data) {
-        super.writeToNBT(data);
+    public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.writeToNBT(data, registries);
 
         data.putBoolean("isLocked", this.isLocked);
 

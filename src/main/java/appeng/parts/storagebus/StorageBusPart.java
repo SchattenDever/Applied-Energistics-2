@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -200,17 +201,17 @@ public class StorageBusPart extends UpgradeablePart
     }
 
     @Override
-    public void readFromNBT(CompoundTag data) {
-        super.readFromNBT(data);
+    public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.readFromNBT(data, registries);
         this.priority = data.getInt("priority");
-        config.readFromChildTag(data, "config");
+        config.readFromChildTag(data, "config", registries);
     }
 
     @Override
-    public void writeToNBT(CompoundTag data) {
-        super.writeToNBT(data);
+    public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.writeToNBT(data, registries);
         data.putInt("priority", this.priority);
-        config.writeToChildTag(data, "config");
+        config.writeToChildTag(data, "config", registries);
     }
 
     @Override

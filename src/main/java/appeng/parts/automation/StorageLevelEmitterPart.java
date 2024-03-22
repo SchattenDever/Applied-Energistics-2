@@ -21,6 +21,7 @@ package appeng.parts.automation;
 import java.util.List;
 import java.util.Set;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
@@ -273,15 +274,15 @@ public class StorageLevelEmitterPart extends AbstractLevelEmitterPart
     }
 
     @Override
-    public void readFromNBT(CompoundTag data) {
-        super.readFromNBT(data);
-        config.readFromChildTag(data, "config");
+    public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.readFromNBT(data, registries);
+        config.readFromChildTag(data, "config", registries);
     }
 
     @Override
-    public void writeToNBT(CompoundTag data) {
-        super.writeToNBT(data);
-        config.writeToChildTag(data, "config");
+    public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.writeToNBT(data, registries);
+        config.writeToChildTag(data, "config", registries);
     }
 
     @Override

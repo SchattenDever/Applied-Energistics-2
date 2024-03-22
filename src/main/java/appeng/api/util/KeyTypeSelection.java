@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -86,7 +87,7 @@ public class KeyTypeSelection {
         tag.put("enabledKeyTypes", enabledKeyTypesTag);
     }
 
-    public void readFromNBT(CompoundTag tag) {
+    public void readFromNBT(CompoundTag tag, HolderLookup.Provider registries) {
         for (var entry : keyTypes.entrySet()) {
             entry.setValue(false);
         }

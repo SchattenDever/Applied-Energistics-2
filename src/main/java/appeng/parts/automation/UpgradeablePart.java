@@ -20,6 +20,7 @@ package appeng.parts.automation;
 
 import java.util.List;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
@@ -87,17 +88,17 @@ public abstract class UpgradeablePart extends AEBasePart implements IConfigurabl
     }
 
     @Override
-    public void readFromNBT(CompoundTag extra) {
-        super.readFromNBT(extra);
-        this.config.readFromNBT(extra);
-        this.upgrades.readFromNBT(extra, "upgrades");
+    public void readFromNBT(CompoundTag extra, HolderLookup.Provider registries) {
+        super.readFromNBT(extra, registries);
+        this.config.readFromNBT(extra, registries);
+        this.upgrades.readFromNBT(extra, "upgrades", registries);
     }
 
     @Override
-    public void writeToNBT(CompoundTag extra) {
-        super.writeToNBT(extra);
-        this.config.writeToNBT(extra);
-        this.upgrades.writeToNBT(extra, "upgrades");
+    public void writeToNBT(CompoundTag extra, HolderLookup.Provider registries) {
+        super.writeToNBT(extra, registries);
+        this.config.writeToNBT(extra, registries);
+        this.upgrades.writeToNBT(extra, "upgrades", registries);
     }
 
     @Override

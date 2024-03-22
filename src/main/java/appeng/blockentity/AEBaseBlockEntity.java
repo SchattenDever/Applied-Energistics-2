@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -123,7 +124,7 @@ public class AEBaseBlockEntity extends BlockEntity
     }
 
     @Override
-    public final void load(CompoundTag tag) {
+    public final void load(CompoundTag tag, HolderLookup.Provider registries) {
         // On the client, this can either be data received as part of an initial chunk update,
         // or as part of a sole block entity data update.
         if (tag.contains("#upd", Tag.TAG_BYTE_ARRAY) && tag.size() == 1) {
@@ -143,11 +144,11 @@ public class AEBaseBlockEntity extends BlockEntity
             loadVisualState(tag.getCompound("visual"));
         }
 
-        super.load(tag);
-        loadTag(tag);
+        super.load(tag, registries);
+        loadTag(tag, registries);
     }
 
-    public void loadTag(CompoundTag data) {
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
         if (data.contains("customName")) {
             this.customName = Component.literal(data.getString("customName"));
         } else {
@@ -166,7 +167,7 @@ public class AEBaseBlockEntity extends BlockEntity
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
         // Save visual state first, so that it can never overwrite normal state
         if (VisualStateSaving.isEnabled(level)) {
             var visualTag = new CompoundTag();
@@ -174,7 +175,7 @@ public class AEBaseBlockEntity extends BlockEntity
             data.put("visual", visualTag);
         }
 
-        super.saveAdditional(data);
+        super.saveAdditional(data, registries);
 
         if (this.customName != null) {
             data.putString("customName", this.customName.getString());
@@ -209,7 +210,7 @@ public class AEBaseBlockEntity extends BlockEntity
      * doesn't need update syncs, it returns null.
      */
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         var data = new CompoundTag();
 
         var stream = new FriendlyByteBuf(Unpooled.buffer());
@@ -248,7 +249,7 @@ public class AEBaseBlockEntity extends BlockEntity
      * Used to store the state that is synchronized to clients for the visual appearance of this part as NBT. This is
      * only used to store this state for tools such as Create Ponders in Structure NBT. Actual synchronization uses
      * {@link #writeToStream(FriendlyByteBuf)} and {@link #readFromStream(FriendlyByteBuf)}. Any data that is saved to
-     * the NBT tag in {@link #saveAdditional(CompoundTag)} does not need to be saved here again.
+     * the NBT tag in {@link #saveAdditional(CompoundTag, HolderLookup.Provider)} does not need to be saved here again.
      * <p>
      * The data saved should be equivalent to the data sent to the client in {@link #writeToStream}.
      */

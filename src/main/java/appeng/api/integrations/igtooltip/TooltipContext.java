@@ -1,5 +1,7 @@
 package appeng.api.integrations.igtooltip;
 
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.nbt.CompoundTag;
@@ -8,4 +10,7 @@ import net.minecraft.world.phys.Vec3;
 
 @ApiStatus.Experimental
 public record TooltipContext(CompoundTag serverData, Vec3 hitLocation, Player player) {
+    public HolderLookup.Provider registries() {
+        return player.registryAccess();
+    }
 }

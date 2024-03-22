@@ -23,6 +23,7 @@ import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -260,15 +261,15 @@ public class DriveBlockEntity extends AENetworkInvBlockEntity
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
         this.isCached = false;
         this.priority = data.getInt("priority");
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
         data.putInt("priority", this.priority);
     }
 

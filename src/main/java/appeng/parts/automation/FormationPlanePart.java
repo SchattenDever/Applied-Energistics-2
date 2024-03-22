@@ -20,6 +20,7 @@ package appeng.parts.automation;
 
 import java.util.List;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -197,18 +198,18 @@ public class FormationPlanePart extends UpgradeablePart implements IStorageProvi
     }
 
     @Override
-    public void readFromNBT(CompoundTag data) {
-        super.readFromNBT(data);
+    public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.readFromNBT(data, registries);
         this.priority = data.getInt("priority");
-        this.config.readFromChildTag(data, "config");
+        this.config.readFromChildTag(data, "config", registries);
         remountStorage();
     }
 
     @Override
-    public void writeToNBT(CompoundTag data) {
-        super.writeToNBT(data);
+    public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.writeToNBT(data, registries);
         data.putInt("priority", this.getPriority());
-        this.config.writeToChildTag(data, "config");
+        this.config.writeToChildTag(data, "config", registries);
     }
 
     @Override

@@ -21,6 +21,7 @@ package appeng.parts.automation;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,15 +90,15 @@ public class ExportBusPart extends IOBusPart implements ICraftingRequester {
     }
 
     @Override
-    public void readFromNBT(CompoundTag extra) {
-        super.readFromNBT(extra);
+    public void readFromNBT(CompoundTag extra, HolderLookup.Provider registries) {
+        super.readFromNBT(extra, registries);
         this.craftingTracker.readFromNBT(extra);
         this.nextSlot = extra.getInt("nextSlot");
     }
 
     @Override
-    public void writeToNBT(CompoundTag extra) {
-        super.writeToNBT(extra);
+    public void writeToNBT(CompoundTag extra, HolderLookup.Provider registries) {
+        super.writeToNBT(extra, registries);
         this.craftingTracker.writeToNBT(extra);
         extra.putInt("nextSlot", this.nextSlot);
     }

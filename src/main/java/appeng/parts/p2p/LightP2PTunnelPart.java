@@ -21,6 +21,7 @@ package appeng.parts.p2p;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.BlockGetter;
@@ -141,14 +142,14 @@ public class LightP2PTunnelPart extends P2PTunnelPart<LightP2PTunnelPart> implem
     }
 
     @Override
-    public void readFromNBT(CompoundTag tag) {
-        super.readFromNBT(tag);
+    public void readFromNBT(CompoundTag tag, HolderLookup.Provider registries) {
+        super.readFromNBT(tag, registries);
         this.lastValue = tag.getInt("lastValue");
     }
 
     @Override
-    public void writeToNBT(CompoundTag tag) {
-        super.writeToNBT(tag);
+    public void writeToNBT(CompoundTag tag, HolderLookup.Provider registries) {
+        super.writeToNBT(tag, registries);
         tag.putInt("lastValue", this.lastValue);
     }
 

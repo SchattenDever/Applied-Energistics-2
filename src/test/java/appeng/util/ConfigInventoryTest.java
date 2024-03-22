@@ -35,7 +35,7 @@ public class ConfigInventoryTest {
             var mixedInv = new GenericStackInv(null, 2);
             mixedInv.setStack(0, ONE_STICK);
             mixedInv.setStack(1, new GenericStack(AEFluidKey.of(Fluids.WATER), 1));
-            inv.readFromTag(mixedInv.writeToTag());
+            inv.readFromTag(mixedInv.writeToTag(), );
         }
 
         @Test

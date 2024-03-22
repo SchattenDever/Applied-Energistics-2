@@ -20,6 +20,7 @@ package appeng.blockentity.spatial;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
@@ -59,14 +60,14 @@ public class SpatialIOPortBlockEntity extends AENetworkInvBlockEntity {
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
         data.putInt("lastRedstoneState", this.lastRedstoneState.ordinal());
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
         if (data.contains("lastRedstoneState")) {
             this.lastRedstoneState = YesNo.values()[data.getInt("lastRedstoneState")];
         }

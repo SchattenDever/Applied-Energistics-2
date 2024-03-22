@@ -55,7 +55,7 @@ class GenericStackInvTest {
         large.setStack(0, ONE_STICK);
         large.setStack(1, ONE_STICK);
 
-        inv.readFromTag(large.writeToTag());
+        inv.readFromTag(large.writeToTag(), );
 
         assertEquals(ONE_STICK, inv.getStack(0));
         // Size didnt change...
@@ -65,7 +65,7 @@ class GenericStackInvTest {
     @Test
     void testLoadingFromEmptyTagClearsFilledSlots() {
         inv.setStack(0, ONE_STICK);
-        inv.readFromTag(new ListTag());
+        inv.readFromTag(new ListTag(), );
         assertNull(inv.getStack(0));
     }
 
@@ -80,7 +80,7 @@ class GenericStackInvTest {
     @Test
     void testWritingAnEmptyInventoryProducesNoChildTag() {
         var tag = new CompoundTag();
-        inv.writeToChildTag(tag, "child");
+        inv.writeToChildTag(tag, "child", );
         assertEquals(new CompoundTag(), tag);
     }
 
@@ -91,7 +91,7 @@ class GenericStackInvTest {
     void testWritingToChildTag() {
         var tag = new CompoundTag();
         inv.setStack(0, ONE_STICK);
-        inv.writeToChildTag(tag, "child");
+        inv.writeToChildTag(tag, "child", );
         assertThat(tag.getAllKeys()).containsOnly("child");
     }
 
@@ -102,10 +102,10 @@ class GenericStackInvTest {
     void testReadingFromChildTag() {
         var tag = new CompoundTag();
         inv.setStack(0, ONE_STICK);
-        inv.writeToChildTag(tag, "child");
+        inv.writeToChildTag(tag, "child", );
         inv.clear();
         changeNotifications.set(0);
-        inv.readFromChildTag(tag, "child");
+        inv.readFromChildTag(tag, "child", );
 
         assertEquals(ONE_STICK, inv.getStack(0));
         assertEquals(1, changeNotifications.get());
@@ -120,15 +120,15 @@ class GenericStackInvTest {
         otherInv.setStack(0, ONE_STICK);
 
         // Read once
-        inv.readFromTag(otherInv.writeToTag());
+        inv.readFromTag(otherInv.writeToTag(), );
         assertEquals(1, changeNotifications.get());
 
         // Read again
-        inv.readFromTag(otherInv.writeToTag());
+        inv.readFromTag(otherInv.writeToTag(), );
         assertEquals(1, changeNotifications.get());
 
         // Notification on clear
-        inv.readFromTag(new ListTag());
+        inv.readFromTag(new ListTag(), );
         assertEquals(2, changeNotifications.get());
     }
 
@@ -156,7 +156,7 @@ class GenericStackInvTest {
     @Test
     void testReadingFromMissingChildTag() {
         inv.setStack(0, ONE_STICK);
-        inv.readFromChildTag(new CompoundTag(), "child");
+        inv.readFromChildTag(new CompoundTag(), "child", );
         assertNull(inv.getStack(0));
     }
 
@@ -190,7 +190,7 @@ class GenericStackInvTest {
             inv.setStack(0, ONE_STICK);
             inv.setStack(0, null);
             inv.setStack(0, ONE_STICK);
-            inv.readFromTag(new ListTag());
+            inv.readFromTag(new ListTag(), );
             assertEquals(0, changeNotifications.get());
             inv.endBatch();
             assertEquals(1, changeNotifications.get());

@@ -21,6 +21,7 @@ package appeng.blockentity.networking;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -67,15 +68,15 @@ public class CableBusBlockEntity extends AEBaseBlockEntity implements AEMultiBlo
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
-        this.getCableBus().readFromNBT(data);
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
+        this.getCableBus().readFromNBT(data, registries);
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
-        this.getCableBus().writeToNBT(data);
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
+        this.getCableBus().writeToNBT(data, registries);
     }
 
     @Override

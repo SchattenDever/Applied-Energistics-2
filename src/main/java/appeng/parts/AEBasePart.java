@@ -21,6 +21,7 @@ package appeng.parts;
 import java.util.EnumSet;
 import java.util.Objects;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
@@ -178,7 +179,7 @@ public abstract class AEBasePart
     }
 
     @Override
-    public void readFromNBT(CompoundTag data) {
+    public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
         this.mainNode.loadFromNBT(data);
 
         if (data.contains("customName")) {
@@ -194,7 +195,7 @@ public abstract class AEBasePart
     }
 
     @Override
-    public void writeToNBT(CompoundTag data) {
+    public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
         this.mainNode.saveToNBT(data);
 
         if (this.customName != null) {
@@ -237,7 +238,7 @@ public abstract class AEBasePart
      * Used to store the state that is synchronized to clients for the visual appearance of this part as NBT. This is
      * only used to store this state for tools such as Create Ponders in Structure NBT. Actual synchronization uses
      * {@link #writeToStream(FriendlyByteBuf)} and {@link #readFromStream(FriendlyByteBuf)}. Any data that is saved to
-     * the NBT tag in {@link #writeToNBT(CompoundTag)} already does not need to be saved here again.
+     * the NBT tag in {@link IPart#writeToNBT(CompoundTag, HolderLookup.Provider)} already does not need to be saved here again.
      */
     @MustBeInvokedByOverriders
     @Override

@@ -20,6 +20,7 @@ package appeng.parts.reporting;
 
 import java.util.List;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -106,19 +107,19 @@ public abstract class AbstractTerminalPart extends AbstractDisplayPart
     }
 
     @Override
-    public void readFromNBT(CompoundTag data) {
-        super.readFromNBT(data);
-        this.cm.readFromNBT(data);
-        this.keyTypeSelection.readFromNBT(data);
-        this.viewCell.readFromNBT(data, "viewCell");
+    public void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.readFromNBT(data, registries);
+        this.cm.readFromNBT(data, registries);
+        this.keyTypeSelection.readFromNBT(data, registries);
+        this.viewCell.readFromNBT(data, "viewCell", registries);
     }
 
     @Override
-    public void writeToNBT(CompoundTag data) {
-        super.writeToNBT(data);
-        this.cm.writeToNBT(data);
+    public void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
+        super.writeToNBT(data, registries);
+        this.cm.writeToNBT(data, registries);
         this.keyTypeSelection.writeToNBT(data);
-        this.viewCell.writeToNBT(data, "viewCell");
+        this.viewCell.writeToNBT(data, "viewCell", registries);
     }
 
     @Override

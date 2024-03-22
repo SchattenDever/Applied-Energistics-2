@@ -28,6 +28,7 @@ import java.util.Set;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
@@ -106,17 +107,19 @@ public interface IPart extends ICustomCableConnection, Clearable {
      * Write the part information for saving. This information will be saved alongside the {@link #getPartItem()} to
      * save settings, inventory or other values to the world.
      *
-     * @param data to be written nbt data
+     * @param data       to be written nbt data
+     * @param registries
      */
-    default void writeToNBT(CompoundTag data) {
+    default void writeToNBT(CompoundTag data, HolderLookup.Provider registries) {
     }
 
     /**
      * Read the previously written NBT Data. this is the mirror for {@link #writeToNBT}.
      *
-     * @param data to be read nbt data
+     * @param data       to be read nbt data
+     * @param registries
      */
-    default void readFromNBT(CompoundTag data) {
+    default void readFromNBT(CompoundTag data, HolderLookup.Provider registries) {
     }
 
     /**
@@ -200,7 +203,7 @@ public interface IPart extends ICustomCableConnection, Clearable {
      * Used to store the state that is synchronized to clients for the visual appearance of this part as NBT. This is
      * only used to store this state for tools such as Create Ponders in Structure NBT. Actual synchronization uses
      * {@link #writeToStream(FriendlyByteBuf)} and {@link #readFromStream(FriendlyByteBuf)}. Any data that is saved to
-     * the NBT tag in {@link #writeToNBT(CompoundTag)} does not need to be saved here again.
+     * the NBT tag in {@link #writeToNBT(CompoundTag, HolderLookup.Provider)} does not need to be saved here again.
      * <p>
      * The data saved should be equivalent to the data sent to the client in {@link #writeToStream}.
      * <p>
@@ -227,7 +230,7 @@ public interface IPart extends ICustomCableConnection, Clearable {
      * Used to store the state that is synchronized to clients for the visual appearance of this part as NBT. This is
      * only used to store this state for tools such as Create Ponders in Structure NBT. Actual synchronization uses
      * {@link #writeToStream(FriendlyByteBuf)} and {@link #readFromStream(FriendlyByteBuf)}. Any data that is saved to
-     * the NBT tag in {@link #writeToNBT(CompoundTag)} already does not need to be saved here again.
+     * the NBT tag in {@link #writeToNBT(CompoundTag, HolderLookup.Provider)} already does not need to be saved here again.
      */
     @ApiStatus.Experimental
     default void readVisualStateFromNBT(CompoundTag data) {

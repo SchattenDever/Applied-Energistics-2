@@ -20,6 +20,7 @@ package appeng.blockentity.crafting;
 
 import java.util.List;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -228,8 +229,8 @@ public class MolecularAssemblerBlockEntity extends AENetworkInvBlockEntity
     }
 
     @Override
-    public void saveAdditional(CompoundTag data) {
-        super.saveAdditional(data);
+    public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
+        super.saveAdditional(data, registries);
         if (this.forcePlan) {
             // If the plan is null it means the pattern previously loaded from NBT hasn't been decoded yet
             var pattern = myPlan != null ? myPlan.getDefinition().toStack() : myPattern;
@@ -241,12 +242,12 @@ public class MolecularAssemblerBlockEntity extends AENetworkInvBlockEntity
             }
         }
 
-        this.upgrades.writeToNBT(data, "upgrades");
+        this.upgrades.writeToNBT(data, "upgrades", registries);
     }
 
     @Override
-    public void loadTag(CompoundTag data) {
-        super.loadTag(data);
+    public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
+        super.loadTag(data, registries);
 
         // Reset current state back to defaults
         this.forcePlan = false;
@@ -262,7 +263,7 @@ public class MolecularAssemblerBlockEntity extends AENetworkInvBlockEntity
             }
         }
 
-        this.upgrades.readFromNBT(data, "upgrades");
+        this.upgrades.readFromNBT(data, "upgrades", registries);
         this.recalculatePlan();
     }
 
