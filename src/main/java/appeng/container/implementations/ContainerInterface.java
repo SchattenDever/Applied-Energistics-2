@@ -38,6 +38,9 @@ public class ContainerInterface extends ContainerUpgradeable
 
 	private final DualityInterface myDuality;
 
+	@GuiSync(2)
+	public YesNo wMode = YesNo.NO;
+
 	@GuiSync( 3 )
 	public YesNo bMode = YesNo.NO;
 
@@ -96,7 +99,16 @@ public class ContainerInterface extends ContainerUpgradeable
 	protected void loadSettingsFromHost( final IConfigManager cm )
 	{
 		this.setBlockingMode( (YesNo) cm.getSetting( Settings.BLOCK ) );
+		this.setWaitingMode((YesNo) cm.getSetting(Settings.WAIT_MODE));
 		this.setInterfaceTerminalMode( (YesNo) cm.getSetting( Settings.INTERFACE_TERMINAL ) );
+	}
+
+	public YesNo getWaitingMode() {
+		return this.wMode;
+	}
+
+	public void setWaitingMode(final YesNo wMode) {
+		this.wMode = wMode;
 	}
 
 	public YesNo getBlockingMode()

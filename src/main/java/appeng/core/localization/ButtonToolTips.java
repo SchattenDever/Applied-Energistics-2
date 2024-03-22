@@ -43,6 +43,7 @@ public enum ButtonToolTips
 	TrashController,
 
 	InterfaceBlockingMode,
+	InterfaceWaitingMode,
 	InterfaceCraftingMode,
 	Trash,
 	MatterBalls,
@@ -98,6 +99,8 @@ public enum ButtonToolTips
 
 	Blocking,
 	NonBlocking,
+	Waiting,
+	NonWaiting,
 
 	LevelType,
 	LevelType_Energy,

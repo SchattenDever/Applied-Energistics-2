@@ -59,6 +59,8 @@ public enum Settings
 
 	BLOCK( EnumSet.of( YesNo.YES, YesNo.NO ) ),
 
+	WAIT_MODE( EnumSet.of(YesNo.YES, YesNo.NO)),
+
 	OPERATION_MODE( EnumSet.allOf( OperationMode.class ) ),
 
 	FULLNESS_MODE( EnumSet.allOf( FullnessMode.class ) ),

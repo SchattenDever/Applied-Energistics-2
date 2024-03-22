@@ -155,6 +155,9 @@ public class GuiImgButton extends GuiButton implements ITooltip
 			this.registerApp( 16 + 5, Settings.BLOCK, YesNo.YES, ButtonToolTips.InterfaceBlockingMode, ButtonToolTips.Blocking );
 			this.registerApp( 16 + 4, Settings.BLOCK, YesNo.NO, ButtonToolTips.InterfaceBlockingMode, ButtonToolTips.NonBlocking );
 
+			this.registerApp(16 + 9, Settings.WAIT_MODE, YesNo.YES, ButtonToolTips.InterfaceWaitingMode, ButtonToolTips.Waiting);
+			this.registerApp(16 + 8, Settings.WAIT_MODE, YesNo.NO, ButtonToolTips.InterfaceWaitingMode, ButtonToolTips.NonWaiting);
+
 			this.registerApp( 16 + 3, Settings.CRAFT_ONLY, YesNo.YES, ButtonToolTips.Craft, ButtonToolTips.CraftOnly );
 			this.registerApp( 16 + 2, Settings.CRAFT_ONLY, YesNo.NO, ButtonToolTips.Craft, ButtonToolTips.CraftEither );
 

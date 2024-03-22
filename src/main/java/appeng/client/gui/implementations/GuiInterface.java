@@ -45,6 +45,7 @@ public class GuiInterface extends GuiUpgradeable
 
 	private GuiTabButton priority;
 	private GuiImgButton BlockMode;
+	private GuiImgButton WaitMode;
 	private GuiToggleButton interfaceMode;
 
 	public GuiInterface( final InventoryPlayer inventoryPlayer, final IInterfaceHost te )
@@ -62,7 +63,10 @@ public class GuiInterface extends GuiUpgradeable
 		this.BlockMode = new GuiImgButton( this.guiLeft - 18, this.guiTop + 8, Settings.BLOCK, YesNo.NO );
 		this.buttonList.add( this.BlockMode );
 
-		this.interfaceMode = new GuiToggleButton( this.guiLeft - 18, this.guiTop + 26, 84, 85, GuiText.InterfaceTerminal
+		this.WaitMode = new GuiImgButton(this.guiLeft - 18, this.guiTop + 26, Settings.WAIT_MODE, YesNo.NO);
+		this.buttonList.add(this.WaitMode);
+
+		this.interfaceMode = new GuiToggleButton( this.guiLeft - 18, this.guiTop + 44, 84, 85, GuiText.InterfaceTerminal
 				.getLocal(), GuiText.InterfaceTerminalHint.getLocal() );
 		this.buttonList.add( this.interfaceMode );
 	}
@@ -73,6 +77,10 @@ public class GuiInterface extends GuiUpgradeable
 		if( this.BlockMode != null )
 		{
 			this.BlockMode.set( ( (ContainerInterface) this.cvb ).getBlockingMode() );
+		}
+
+		if (this.WaitMode != null) {
+			this.WaitMode.set(((ContainerInterface) this.cvb).getWaitingMode());
 		}
 
 		if( this.interfaceMode != null )
@@ -115,6 +123,10 @@ public class GuiInterface extends GuiUpgradeable
 		if( btn == this.BlockMode )
 		{
 			NetworkHandler.instance().sendToServer( new PacketConfigButton( this.BlockMode.getSetting(), backwards ) );
+		}
+
+		if (btn == this.WaitMode) {
+			NetworkHandler.instance().sendToServer(new PacketConfigButton(this.WaitMode.getSetting(), backwards));
 		}
 	}
 }

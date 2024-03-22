@@ -150,6 +150,7 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 
 		this.upgrades = new StackUpgradeInventory( this.gridProxy.getMachineRepresentation(), this, 1 );
 		this.cm.registerSetting( Settings.BLOCK, YesNo.NO );
+		this.cm.registerSetting(Settings.WAIT_MODE, YesNo.NO);
 		this.cm.registerSetting( Settings.INTERFACE_TERMINAL, YesNo.YES );
 
 		this.iHost = ih;
@@ -947,6 +948,15 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 					}
 				}
 
+				if (this.isWaiting()) {
+					IAEItemStack outputStack = patternDetails.getOutputs()[0];
+					try {
+						if (this.gridProxy.getCrafting().requesting(outputStack) != 0) continue;
+					} catch (GridAccessException e) {
+						// :P
+					}
+				}
+
 				if( this.acceptsItems( ad, table ) )
 				{
 					for( int x = 0; x < table.getSizeInventory(); x++ )
@@ -1014,6 +1024,10 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 	private boolean isBlocking()
 	{
 		return this.cm.getSetting( Settings.BLOCK ) == YesNo.YES;
+	}
+
+	private boolean isWaiting() {
+		return this.cm.getSetting(Settings.WAIT_MODE) == YesNo.YES;
 	}
 
 	private boolean acceptsItems( final InventoryAdaptor ad, final InventoryCrafting table )
