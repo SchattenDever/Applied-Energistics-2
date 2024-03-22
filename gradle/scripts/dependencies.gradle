@@ -35,8 +35,8 @@ repositories {
     }
 
     maven {
-        name = "IC2 repo"
-        url = "http://maven.ic2.player.to"
+        name = "CF repo"
+        url "https://cursemaven.com"
     }
 
     maven {
@@ -54,10 +54,10 @@ repositories {
         url "http://maven.k-4u.nl/"
     }
 
-    maven { // Hwyla
-        name 'tehnut'
-        url "http://tehnut.info/maven"
-    }
+//    maven { // Hwyla
+//        name 'tehnut'
+//        url "http://tehnut.info/maven"
+//    }
 
    	maven { // CraftTweaker
         name 'jared maven'
@@ -82,14 +82,14 @@ configurations {
 dependencies {
     // installable runtime dependencies
     mods "mcp.mobius.waila:Hwyla:${hwyla_version}"
-    mods "net.industrial-craft:industrialcraft-2:${ic2_version}:dev"
+    mods "curse.maven:industrial-craft-242638:2547176"
     mods "mcjty.theoneprobe:TheOneProbe-${minecraft_version}:${top_version}"
 
     // compile against provided APIs
     compileOnly "mezz.jei:jei_${minecraft_version}:${jei_version}:api"
     compileOnly "mcp.mobius.waila:Hwyla:${hwyla_version}"
     compileOnly "net.darkhax.tesla:Tesla-1.12.2:${tesla_version}"
-    compileOnly "net.industrial-craft:industrialcraft-2:${ic2_version}:api"
+    compileOnly "curse.maven:industrial-craft-242638:2547177"
     compileOnly "mcjty.theoneprobe:TheOneProbe-1.12:${top_version}:api"
     compileOnly "cofh:CoFHCore:${cofhcore_version}:deobf"
     compileOnly "CraftTweaker2:CraftTweaker2-API:${crafttweaker_version}"
