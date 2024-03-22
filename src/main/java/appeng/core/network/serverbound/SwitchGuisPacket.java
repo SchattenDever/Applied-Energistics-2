@@ -1,10 +1,12 @@
 
 package appeng.core.network.serverbound;
 
+import appeng.core.network.CustomAppEngPayload;
+import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.MenuType;
 
@@ -15,8 +17,20 @@ import appeng.menu.MenuOpener;
 
 public record SwitchGuisPacket(
         @Nullable MenuType<? extends ISubMenu> newGui) implements ServerboundPacket {
+    public static final StreamCodec<RegistryFriendlyByteBuf, SwitchGuisPacket> STREAM_CODEC = StreamCodec.ofMember(
+            SwitchGuisPacket::write,
+            SwitchGuisPacket::decode
+    );
+
+    public static final Type<SwitchGuisPacket> TYPE = CustomAppEngPayload.createType("switch_guis");
+
+    @Override
+    public Type<SwitchGuisPacket> type() {
+        return TYPE;
+    }
+
     @SuppressWarnings("unchecked")
-    public static SwitchGuisPacket decode(FriendlyByteBuf stream) {
+    public static SwitchGuisPacket decode(RegistryFriendlyByteBuf stream) {
         MenuType<? extends ISubMenu> newGui = null;
         if (stream.readBoolean()) {
             newGui = (MenuType<? extends ISubMenu>) BuiltInRegistries.MENU.get(stream.readResourceLocation());
@@ -24,8 +38,7 @@ public record SwitchGuisPacket(
         return new SwitchGuisPacket(newGui);
     }
 
-    @Override
-    public void write(FriendlyByteBuf data) {
+    public void write(RegistryFriendlyByteBuf data) {
         if (newGui != null) {
             data.writeBoolean(true);
             data.writeResourceLocation(BuiltInRegistries.MENU.getKey(newGui));

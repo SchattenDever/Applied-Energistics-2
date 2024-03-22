@@ -1,9 +1,11 @@
 
 package appeng.core.network.serverbound;
 
+import appeng.core.network.CustomAppEngPayload;
+import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
@@ -15,7 +17,19 @@ import appeng.items.tools.powered.ColorApplicatorItem;
  * Switches the color of any held color applicator to the desired color.
  */
 public record ColorApplicatorSelectColorPacket(@Nullable AEColor color) implements ServerboundPacket {
-    public static ColorApplicatorSelectColorPacket decode(FriendlyByteBuf stream) {
+    public static final StreamCodec<RegistryFriendlyByteBuf, ColorApplicatorSelectColorPacket> STREAM_CODEC = StreamCodec.ofMember(
+            ColorApplicatorSelectColorPacket::write,
+            ColorApplicatorSelectColorPacket::decode
+    );
+
+    public static final Type<ColorApplicatorSelectColorPacket> TYPE = CustomAppEngPayload.createType("color_applicator_select_color");
+
+    @Override
+    public Type<ColorApplicatorSelectColorPacket> type() {
+        return TYPE;
+    }
+
+    public static ColorApplicatorSelectColorPacket decode(RegistryFriendlyByteBuf stream) {
         AEColor color = null;
         if (stream.readBoolean()) {
             color = stream.readEnum(AEColor.class);
@@ -23,8 +37,7 @@ public record ColorApplicatorSelectColorPacket(@Nullable AEColor color) implemen
         return new ColorApplicatorSelectColorPacket(color);
     }
 
-    @Override
-    public void write(FriendlyByteBuf data) {
+    public void write(RegistryFriendlyByteBuf data) {
         if (color != null) {
             data.writeBoolean(true);
             data.writeEnum(color);

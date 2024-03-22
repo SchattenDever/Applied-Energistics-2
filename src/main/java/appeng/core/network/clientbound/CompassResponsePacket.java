@@ -1,7 +1,9 @@
 
 package appeng.core.network.clientbound;
 
-import net.minecraft.network.FriendlyByteBuf;
+import appeng.core.network.CustomAppEngPayload;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -15,8 +17,19 @@ public record CompassResponsePacket(long attunement,
         int cz,
         int cdy,
         CompassResult cr) implements ClientboundPacket {
+    public static final StreamCodec<RegistryFriendlyByteBuf, CompassResponsePacket> STREAM_CODEC = StreamCodec.ofMember(
+            CompassResponsePacket::write,
+            CompassResponsePacket::decode
+    );
 
-    public static CompassResponsePacket decode(FriendlyByteBuf stream) {
+    public static final Type<CompassResponsePacket> TYPE = CustomAppEngPayload.createType("compass_response");
+
+    @Override
+    public Type<CompassResponsePacket> type() {
+        return TYPE;
+    }
+
+    public static CompassResponsePacket decode(RegistryFriendlyByteBuf stream) {
         var attunement = stream.readLong();
         var cx = stream.readInt();
         var cz = stream.readInt();
@@ -26,8 +39,7 @@ public record CompassResponsePacket(long attunement,
         return new CompassResponsePacket(attunement, cx, cz, cdy, cr);
     }
 
-    @Override
-    public void write(FriendlyByteBuf data) {
+    public void write(RegistryFriendlyByteBuf data) {
         data.writeLong(attunement);
         data.writeInt(cx);
         data.writeInt(cz);

@@ -8,12 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import appeng.core.AppEng;
 
 public interface CustomAppEngPayload extends CustomPacketPayload {
-    static ResourceLocation makeId(Class<? extends CustomPacketPayload> payloadClass) {
-        return AppEng.makeId(payloadClass.getSimpleName().toLowerCase(Locale.ROOT));
-    }
-
-    @Override
-    default ResourceLocation id() {
-        return makeId(getClass());
+    static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> createType(String name) {
+        return new CustomPacketPayload.Type<>(AppEng.makeId(name));
     }
 }

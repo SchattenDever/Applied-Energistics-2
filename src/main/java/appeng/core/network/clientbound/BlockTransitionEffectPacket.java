@@ -1,12 +1,14 @@
 
 package appeng.core.network.clientbound;
 
+import appeng.core.network.CustomAppEngPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -35,13 +37,23 @@ public record BlockTransitionEffectPacket(BlockPos pos,
         BlockState blockState,
         Direction direction,
         SoundMode soundMode) implements ClientboundPacket {
+    public static final StreamCodec<RegistryFriendlyByteBuf, BlockTransitionEffectPacket> STREAM_CODEC = StreamCodec.ofMember(
+            BlockTransitionEffectPacket::write,
+            BlockTransitionEffectPacket::decode
+    );
+
+    public static final Type<BlockTransitionEffectPacket> TYPE = CustomAppEngPayload.createType("block_transition_effect");
+
+    @Override
+    public Type<BlockTransitionEffectPacket> type() {
+        return TYPE;
+    }
 
     public enum SoundMode {
         BLOCK, FLUID, NONE
     }
 
-    @Override
-    public void write(FriendlyByteBuf data) {
+    public void write(RegistryFriendlyByteBuf data) {
         data.writeBlockPos(pos);
         int blockStateId = GameData.getBlockStateIDMap().getId(blockState);
         if (blockStateId == -1) {
@@ -52,7 +64,7 @@ public record BlockTransitionEffectPacket(BlockPos pos,
         data.writeEnum(soundMode);
     }
 
-    public static BlockTransitionEffectPacket decode(FriendlyByteBuf data) {
+    public static BlockTransitionEffectPacket decode(RegistryFriendlyByteBuf data) {
 
         var pos = data.readBlockPos();
         int blockStateId = data.readInt();

@@ -23,6 +23,7 @@ import java.util.Objects;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -88,8 +89,8 @@ public class InscriberRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack assemble(Container inv, RegistryAccess registryAccess) {
-        return getResultItem(registryAccess).copy();
+    public ItemStack assemble(Container inv, HolderLookup.Provider registries) {
+        return getResultItem(registries).copy();
     }
 
     @Override
@@ -98,7 +99,7 @@ public class InscriberRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess registryAccess) {
+    public ItemStack getResultItem(HolderLookup.Provider registries) {
         return getResultItem();
     }
 

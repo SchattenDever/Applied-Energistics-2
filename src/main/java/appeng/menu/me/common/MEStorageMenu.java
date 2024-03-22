@@ -271,7 +271,7 @@ public class MEStorageMenu extends AEBaseMenu
 
                 if (updateHelper.hasChanges()) {
                     var builder = MEInventoryUpdatePacket
-                            .builder(containerId, updateHelper.isFullUpdate());
+                            .builder(containerId, updateHelper.isFullUpdate(), getPlayer().registryAccess());
                     builder.setFilter(this::isKeyVisible);
                     builder.addChanges(updateHelper, availableStacks, craftables, requestables);
                     builder.buildAndSend(this::sendPacketToClient);

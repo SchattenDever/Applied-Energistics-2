@@ -1,8 +1,10 @@
 
 package appeng.core.network.clientbound;
 
+import appeng.core.network.CustomAppEngPayload;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -18,6 +20,18 @@ public record MatterCannonPacket(double x,
         double dz,
         byte len) implements ClientboundPacket {
 
+    public static final StreamCodec<RegistryFriendlyByteBuf, MatterCannonPacket> STREAM_CODEC = StreamCodec.ofMember(
+            MatterCannonPacket::write,
+            MatterCannonPacket::decode
+    );
+
+    public static final Type<MatterCannonPacket> TYPE = CustomAppEngPayload.createType("matter_cannon");
+
+    @Override
+    public Type<MatterCannonPacket> type() {
+        return TYPE;
+    }
+
     public MatterCannonPacket(double x, double y, double z, double dx, double dy, double dz, byte len) {
         var dl = dx * dx + dy * dy + dz * dz;
         var dlz = (float) Math.sqrt(dl);
@@ -31,7 +45,7 @@ public record MatterCannonPacket(double x,
         this.len = len;
     }
 
-    public static MatterCannonPacket decode(FriendlyByteBuf stream) {
+    public static MatterCannonPacket decode(RegistryFriendlyByteBuf stream) {
         var x = stream.readFloat();
         var y = stream.readFloat();
         var z = stream.readFloat();
@@ -42,8 +56,7 @@ public record MatterCannonPacket(double x,
         return new MatterCannonPacket(x, y, z, dx, dy, dz, len);
     }
 
-    @Override
-    public void write(FriendlyByteBuf data) {
+    public void write(RegistryFriendlyByteBuf data) {
         data.writeFloat((float) x);
         data.writeFloat((float) y);
         data.writeFloat((float) z);

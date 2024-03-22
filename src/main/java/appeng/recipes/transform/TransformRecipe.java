@@ -1,5 +1,6 @@
 package appeng.recipes.transform;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -42,8 +43,8 @@ public final class TransformRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack assemble(Container container, RegistryAccess registryAccess) {
-        ItemStack result = getResultItem(registryAccess).copy();
+    public ItemStack assemble(Container container, HolderLookup.Provider registries) {
+        ItemStack result = getResultItem(registries).copy();
         if (AEItems.QUANTUM_ENTANGLED_SINGULARITY.isSameAs(result) && result.getCount() > 1) {
             QuantumBridgeBlockEntity.assignFrequency(result);
         }
@@ -56,7 +57,7 @@ public final class TransformRecipe implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess registryAccess) {
+    public ItemStack getResultItem(HolderLookup.Provider registries) {
         return getResultItem();
     }
 

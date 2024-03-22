@@ -9,11 +9,6 @@ import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 import appeng.core.AppEng;
 
 public interface ClientboundPacket extends CustomAppEngPayload {
-    @Override
-    default ResourceLocation id() {
-        return AppEng.makeId(getClass().getSimpleName().toLowerCase(Locale.ROOT));
-    }
-
     default void handleOnClient(PlayPayloadContext context) {
         context.workHandler().execute(() -> {
             context.player().ifPresent(this::handleOnClient);
