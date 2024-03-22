@@ -22,12 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -80,7 +80,7 @@ public class CableBusBlockEntity extends AEBaseBlockEntity implements AEMultiBlo
     }
 
     @Override
-    protected boolean readFromStream(FriendlyByteBuf data) {
+    protected boolean readFromStream(RegistryFriendlyByteBuf data) {
         final boolean c = super.readFromStream(data);
         boolean ret = this.getCableBus().readFromStream(data);
 
@@ -96,7 +96,7 @@ public class CableBusBlockEntity extends AEBaseBlockEntity implements AEMultiBlo
     }
 
     @Override
-    protected void writeToStream(FriendlyByteBuf data) {
+    protected void writeToStream(RegistryFriendlyByteBuf data) {
         super.writeToStream(data);
         this.getCableBus().writeToStream(data);
     }

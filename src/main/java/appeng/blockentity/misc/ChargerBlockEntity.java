@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -84,7 +84,7 @@ public class ChargerBlockEntity extends AENetworkPowerBlockEntity implements IGr
     }
 
     @Override
-    protected boolean readFromStream(FriendlyByteBuf data) {
+    protected boolean readFromStream(RegistryFriendlyByteBuf data) {
         var changed = super.readFromStream(data);
 
         this.working = data.readBoolean();
@@ -100,7 +100,7 @@ public class ChargerBlockEntity extends AENetworkPowerBlockEntity implements IGr
     }
 
     @Override
-    protected void writeToStream(FriendlyByteBuf data) {
+    protected void writeToStream(RegistryFriendlyByteBuf data) {
         super.writeToStream(data);
         data.writeBoolean(working);
         var is = AEItemKey.of(this.inv.getStackInSlot(0));

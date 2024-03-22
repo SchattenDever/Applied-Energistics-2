@@ -22,6 +22,7 @@ import java.lang.reflect.Type;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,6 +34,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.mojang.serialization.JsonOps;
 
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.Util;
@@ -47,7 +49,7 @@ public class ScreenStyle {
 
     public static final Gson GSON = new GsonBuilder()
             .disableHtmlEscaping()
-            .registerTypeHierarchyAdapter(Component.class, new Component.SerializerAdapter())
+            .registerTypeHierarchyAdapter(Component.class, new Component.SerializerAdapter(HolderLookup.Provider.create(Stream.of())))
             .registerTypeAdapter(Style.class, new StyleSerializer())
             .registerTypeAdapter(Blitter.class, BlitterDeserializer.INSTANCE)
             .registerTypeAdapter(Rect2i.class, Rectangle2dDeserializer.INSTANCE)

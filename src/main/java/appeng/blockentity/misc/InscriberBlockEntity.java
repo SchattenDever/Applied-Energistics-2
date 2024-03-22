@@ -25,12 +25,12 @@ import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -167,7 +167,7 @@ public class InscriberBlockEntity extends AENetworkPowerBlockEntity
     }
 
     @Override
-    protected boolean readFromStream(FriendlyByteBuf data) {
+    protected boolean readFromStream(RegistryFriendlyByteBuf data) {
         var c = super.readFromStream(data);
 
         var oldSmash = isSmash();
@@ -178,7 +178,7 @@ public class InscriberBlockEntity extends AENetworkPowerBlockEntity
         }
 
         for (int i = 0; i < this.inv.size(); i++) {
-            this.inv.setItemDirect(i, data.readItem());
+            this.inv.setItemDirect(i, ItemStack.OPTIONAL_STREAM_CODEC.decode(data));
         }
         this.cachedTask = null;
 
@@ -186,12 +186,12 @@ public class InscriberBlockEntity extends AENetworkPowerBlockEntity
     }
 
     @Override
-    protected void writeToStream(FriendlyByteBuf data) {
+    protected void writeToStream(RegistryFriendlyByteBuf data) {
         super.writeToStream(data);
 
         data.writeBoolean(isSmash());
         for (int i = 0; i < this.inv.size(); i++) {
-            data.writeItem(inv.getStackInSlot(i));
+            ItemStack.OPTIONAL_STREAM_CODEC.encode(data, inv.getStackInSlot(i));
         }
     }
 

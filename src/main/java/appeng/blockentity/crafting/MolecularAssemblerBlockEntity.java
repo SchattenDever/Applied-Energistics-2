@@ -21,12 +21,12 @@ package appeng.blockentity.crafting;
 import java.util.List;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -215,7 +215,7 @@ public class MolecularAssemblerBlockEntity extends AENetworkInvBlockEntity
     }
 
     @Override
-    protected boolean readFromStream(FriendlyByteBuf data) {
+    protected boolean readFromStream(RegistryFriendlyByteBuf data) {
         final boolean c = super.readFromStream(data);
         final boolean oldPower = this.isPowered;
         this.isPowered = data.readBoolean();
@@ -223,7 +223,7 @@ public class MolecularAssemblerBlockEntity extends AENetworkInvBlockEntity
     }
 
     @Override
-    protected void writeToStream(FriendlyByteBuf data) {
+    protected void writeToStream(RegistryFriendlyByteBuf data) {
         super.writeToStream(data);
         data.writeBoolean(this.isPowered);
     }
@@ -236,7 +236,7 @@ public class MolecularAssemblerBlockEntity extends AENetworkInvBlockEntity
             var pattern = myPlan != null ? myPlan.getDefinition().toStack() : myPattern;
             if (!pattern.isEmpty()) {
                 var compound = new CompoundTag();
-                pattern.save(compound);
+                pattern.save(registries, compound);
                 data.put("myPlan", compound);
                 data.putInt("pushDirection", this.pushDirection.ordinal());
             }
@@ -255,7 +255,7 @@ public class MolecularAssemblerBlockEntity extends AENetworkInvBlockEntity
         this.myPlan = null;
 
         if (data.contains("myPlan")) {
-            var pattern = ItemStack.of(data.getCompound("myPlan"));
+            var pattern = ItemStack.parseOptional(registries, data.getCompound("myPlan"));
             if (!pattern.isEmpty()) {
                 this.forcePlan = true;
                 this.myPattern = pattern;
@@ -287,7 +287,7 @@ public class MolecularAssemblerBlockEntity extends AENetworkInvBlockEntity
 
                 // If the plan is still null, reset back to non-forced mode
                 if (myPlan == null) {
-                    AELog.warn("Unable to restore auto-crafting pattern after load: %s", myPattern.getTag());
+                    AELog.warn("Unable to restore auto-crafting pattern after load: %s", myPattern);
                     this.forcePlan = false;
                 }
             }

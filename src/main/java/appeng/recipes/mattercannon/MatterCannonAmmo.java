@@ -18,13 +18,17 @@
 
 package appeng.recipes.mattercannon;
 
-import java.util.Objects;
-
+import appeng.core.AppEng;
+import appeng.init.InitRecipeTypes;
 import com.google.common.base.Preconditions;
-
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
@@ -39,8 +43,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.conditions.NotCondition;
 import net.neoforged.neoforge.common.conditions.TagEmptyCondition;
 
-import appeng.core.AppEng;
-import appeng.init.InitRecipeTypes;
+import java.util.Objects;
 
 /**
  * Defines a type of ammo that can be used for the {@link appeng.items.tools.powered.MatterCannonItem}.
@@ -50,6 +53,21 @@ public class MatterCannonAmmo implements Recipe<Container> {
     public static final ResourceLocation TYPE_ID = AppEng.makeId("matter_cannon");
 
     public static final RecipeType<MatterCannonAmmo> TYPE = InitRecipeTypes.register(TYPE_ID.toString());
+
+    public static final Codec<MatterCannonAmmo> CODEC = RecordCodecBuilder.create((builder) -> {
+        return builder.group(
+                        Ingredient.CODEC_NONEMPTY.fieldOf("ammo").forGetter(MatterCannonAmmo::getAmmo),
+                        Codec.FLOAT.fieldOf("weight").forGetter(MatterCannonAmmo::getWeight))
+                .apply(builder, MatterCannonAmmo::new);
+    });
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, MatterCannonAmmo> STREAM_CODEC = StreamCodec.composite(
+            Ingredient.CONTENTS_STREAM_CODEC,
+            MatterCannonAmmo::getAmmo,
+            ByteBufCodecs.FLOAT,
+            MatterCannonAmmo::getWeight,
+            MatterCannonAmmo::new
+    );
 
     private final Ingredient ammo;
 
@@ -80,7 +98,7 @@ public class MatterCannonAmmo implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack assemble(Container inv, RegistryAccess registryAccess) {
+    public ItemStack assemble(Container inv, HolderLookup.Provider registryAccess) {
         return ItemStack.EMPTY;
     }
 
@@ -90,7 +108,7 @@ public class MatterCannonAmmo implements Recipe<Container> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess registryAccess) {
+    public ItemStack getResultItem(HolderLookup.Provider registryAccess) {
         return ItemStack.EMPTY;
     }
 

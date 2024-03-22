@@ -51,7 +51,7 @@ public abstract class AEBaseInvBlockEntity extends AEBaseBlockEntity implements 
             var opt = data.getCompound("inv");
             for (int x = 0; x < inv.size(); x++) {
                 var item = opt.getCompound("item" + x);
-                inv.setItemDirect(x, ItemStack.of(item));
+                inv.setItemDirect(x, ItemStack.parseOptional(registries, item));
             }
         }
     }
@@ -68,7 +68,7 @@ public abstract class AEBaseInvBlockEntity extends AEBaseBlockEntity implements 
                 final CompoundTag item = new CompoundTag();
                 final ItemStack is = inv.getStackInSlot(x);
                 if (!is.isEmpty()) {
-                    is.save(item);
+                    is.save(registries, item);
                 }
                 opt.put("item" + x, item);
             }

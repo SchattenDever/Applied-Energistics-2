@@ -9,6 +9,10 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import net.minecraft.world.level.ChunkPos;
+import net.neoforged.neoforge.client.model.data.ModelDataManager;
+import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -202,22 +206,22 @@ class FakeForwardingServerLevel implements ServerLevelAccessor {
     }
 
     @Override
-    public void gameEvent(GameEvent event, Vec3 position, GameEvent.Context context) {
+    public void gameEvent(Holder<GameEvent> event, Vec3 position, GameEvent.Context context) {
         delegate.gameEvent(event, position, context);
     }
 
     @Override
-    public void gameEvent(@Nullable Entity entity, GameEvent event, Vec3 position) {
+    public void gameEvent(@Nullable Entity entity, Holder<GameEvent> event, Vec3 position) {
         delegate.gameEvent(entity, event, position);
     }
 
     @Override
-    public void gameEvent(@Nullable Entity entity, GameEvent event, BlockPos pos) {
+    public void gameEvent(@Nullable Entity entity, Holder<GameEvent> event, BlockPos pos) {
         delegate.gameEvent(entity, event, pos);
     }
 
     @Override
-    public void gameEvent(GameEvent event, BlockPos pos, GameEvent.Context context) {
+    public void gameEvent(Holder<GameEvent> event, BlockPos pos, GameEvent.Context context) {
         delegate.gameEvent(event, pos, context);
     }
 
@@ -775,5 +779,76 @@ class FakeForwardingServerLevel implements ServerLevelAccessor {
     @Override
     public int getMoonPhase() {
         return delegate.getMoonPhase();
+    }
+
+    @Override
+    public void gameEvent(ResourceKey<GameEvent> p_316780_, BlockPos p_316509_, GameEvent.Context p_316524_) {
+        delegate.gameEvent(p_316780_, p_316509_, p_316524_);
+    }
+
+    @Override
+    public boolean isAreaLoaded(BlockPos center, int range) {
+        return delegate.isAreaLoaded(center, range);
+    }
+
+    @Override
+    @ApiStatus.NonExtendable
+    public @Nullable AuxiliaryLightManager getAuxLightManager(BlockPos pos) {
+        return delegate.getAuxLightManager(pos);
+    }
+
+    @Override
+    public @Nullable AuxiliaryLightManager getAuxLightManager(ChunkPos pos) {
+        return delegate.getAuxLightManager(pos);
+    }
+
+    @Override
+    public @Nullable ModelDataManager getModelDataManager() {
+        return delegate.getModelDataManager();
+    }
+
+    @Override
+    public float getShade(float normalX, float normalY, float normalZ, boolean shade) {
+        return delegate.getShade(normalX, normalY, normalZ, shade);
+    }
+
+    @Override
+    public boolean noBlockCollision(@Nullable Entity pEntity, AABB pBoundingBox) {
+        return delegate.noBlockCollision(pEntity, pBoundingBox);
+    }
+
+    @Override
+    public Optional<BlockPos> findSupportingBlock(Entity pEntity, AABB pBox) {
+        return delegate.findSupportingBlock(pEntity, pBox);
+    }
+
+    @Override
+    public int getDirectSignalTo(BlockPos pPos) {
+        return delegate.getDirectSignalTo(pPos);
+    }
+
+    @Override
+    public int getControlInputSignal(BlockPos pPos, Direction pDirection, boolean pDiodesOnly) {
+        return delegate.getControlInputSignal(pPos, pDirection, pDiodesOnly);
+    }
+
+    @Override
+    public boolean hasSignal(BlockPos pPos, Direction pDirection) {
+        return delegate.hasSignal(pPos, pDirection);
+    }
+
+    @Override
+    public int getSignal(BlockPos pPos, Direction pDirection) {
+        return delegate.getSignal(pPos, pDirection);
+    }
+
+    @Override
+    public boolean hasNeighborSignal(BlockPos pPos) {
+        return delegate.hasNeighborSignal(pPos);
+    }
+
+    @Override
+    public int getBestNeighborSignal(BlockPos pPos) {
+        return delegate.getBestNeighborSignal(pPos);
     }
 }

@@ -21,12 +21,12 @@ package appeng.blockentity.misc;
 import java.util.List;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
@@ -107,7 +107,7 @@ public class VibrationChamberBlockEntity extends AENetworkInvBlockEntity impleme
     }
 
     @Override
-    protected boolean readFromStream(FriendlyByteBuf data) {
+    protected boolean readFromStream(RegistryFriendlyByteBuf data) {
         final boolean c = super.readFromStream(data);
         final boolean wasOn = this.isOn;
 
@@ -117,7 +117,7 @@ public class VibrationChamberBlockEntity extends AENetworkInvBlockEntity impleme
     }
 
     @Override
-    protected void writeToStream(FriendlyByteBuf data) {
+    protected void writeToStream(RegistryFriendlyByteBuf data) {
         super.writeToStream(data);
         this.isOn = this.getRemainingFuelTicks() > 0;
         data.writeBoolean(this.isOn);

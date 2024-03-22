@@ -40,7 +40,7 @@ final class ItemUpgradeInventory extends UpgradeInventory {
         super(stack.getItem(), upgrades);
         this.stack = stack;
         this.changeCallback = changeCallback;
-        this.readFromNBT(stack.getOrCreateTag(), TAG_UPGRADES, reg);
+        this.readFromNBT(stack.getOrCreateTag(), TAG_UPGRADES);
     }
 
     @Override

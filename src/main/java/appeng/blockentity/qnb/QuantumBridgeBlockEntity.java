@@ -25,7 +25,7 @@ import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -106,7 +106,7 @@ public class QuantumBridgeBlockEntity extends AENetworkInvBlockEntity
     }
 
     @Override
-    protected void writeToStream(FriendlyByteBuf data) {
+    protected void writeToStream(RegistryFriendlyByteBuf data) {
         super.writeToStream(data);
         int out = this.constructed;
 
@@ -122,7 +122,7 @@ public class QuantumBridgeBlockEntity extends AENetworkInvBlockEntity
     }
 
     @Override
-    protected boolean readFromStream(FriendlyByteBuf data) {
+    protected boolean readFromStream(RegistryFriendlyByteBuf data) {
         final boolean c = super.readFromStream(data);
         final int oldValue = this.constructed;
         this.constructed = data.readByte();

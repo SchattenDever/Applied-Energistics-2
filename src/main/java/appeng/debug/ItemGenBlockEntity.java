@@ -104,8 +104,8 @@ public class ItemGenBlockEntity extends AEBaseBlockEntity implements InternalInv
             return;
         }
 
-        if (item.canBeDepleted()) {
-            ItemStack sampleStack = new ItemStack(item);
+        ItemStack sampleStack = item.getDefaultInstance();
+        if (sampleStack.isDamageableItem()) {
             int maxDamage = sampleStack.getMaxDamage();
             for (int dmg = 0; dmg < maxDamage; dmg++) {
                 ItemStack is = sampleStack.copy();

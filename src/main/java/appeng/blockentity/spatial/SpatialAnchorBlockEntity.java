@@ -30,7 +30,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -107,7 +107,7 @@ public class SpatialAnchorBlockEntity extends AENetworkBlockEntity
     }
 
     @Override
-    protected void writeToStream(FriendlyByteBuf data) {
+    protected void writeToStream(RegistryFriendlyByteBuf data) {
         super.writeToStream(data);
         data.writeBoolean(this.isActive());
         data.writeBoolean(displayOverlay);
@@ -117,7 +117,7 @@ public class SpatialAnchorBlockEntity extends AENetworkBlockEntity
     }
 
     @Override
-    protected boolean readFromStream(FriendlyByteBuf data) {
+    protected boolean readFromStream(RegistryFriendlyByteBuf data) {
         boolean ret = super.readFromStream(data);
 
         final boolean isActive = data.readBoolean();

@@ -80,7 +80,7 @@ public class CellWorkbenchBlockEntity extends AEBaseBlockEntity
     @Override
     public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
         super.saveAdditional(data, registries);
-        this.cell.writeToNBT(data, "cell");
+        this.cell.writeToNBT(data, "cell", registries);
         this.config.writeToChildTag(data, "config", registries);
         this.manager.writeToNBT(data, registries);
     }

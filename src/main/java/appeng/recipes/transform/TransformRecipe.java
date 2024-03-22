@@ -1,9 +1,20 @@
 package appeng.recipes.transform;
 
+import appeng.blockentity.qnb.QuantumBridgeBlockEntity;
+import appeng.core.AppEng;
+import appeng.core.definitions.AEItems;
+import appeng.init.InitRecipeTypes;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -12,21 +23,44 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
-import appeng.blockentity.qnb.QuantumBridgeBlockEntity;
-import appeng.core.AppEng;
-import appeng.core.definitions.AEItems;
-import appeng.init.InitRecipeTypes;
-
 public final class TransformRecipe implements Recipe<Container> {
     public static final ResourceLocation TYPE_ID = AppEng.makeId("transform");
     public static final RecipeType<TransformRecipe> TYPE = InitRecipeTypes.register(TYPE_ID.toString());
+
+    public static final Codec<TransformRecipe> CODEC = RecordCodecBuilder.create(builder -> {
+        return builder.group(
+                        Ingredient.CODEC_NONEMPTY
+                                .listOf()
+                                .fieldOf("ingredients")
+                                .flatXmap(ingredients -> {
+                                    return DataResult
+                                            .success(NonNullList.of(Ingredient.EMPTY, ingredients.toArray(Ingredient[]::new)));
+                                }, DataResult::success)
+                                .forGetter(r -> r.ingredients),
+                        ItemStack.CODEC.fieldOf("result").forGetter(r -> r.output),
+                        ExtraCodecs
+                                .strictOptionalField(TransformCircumstance.CODEC, "circumstance",
+                                        TransformCircumstance.fluid(FluidTags.WATER))
+                                .forGetter(t -> t.circumstance))
+                .apply(builder, TransformRecipe::new);
+    });
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, TransformRecipe> STREAM_CODEC = StreamCodec.composite(
+            Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.collection(NonNullList::createWithCapacity)),
+            TransformRecipe::getIngredients,
+            ItemStack.STREAM_CODEC,
+            TransformRecipe::getResultItem,
+            TransformCircumstance.STREAM_CODEC,
+            TransformRecipe::getCircumstance,
+            TransformRecipe::new
+    );
 
     public final NonNullList<Ingredient> ingredients;
     public final ItemStack output;
     public final TransformCircumstance circumstance;
 
     public TransformRecipe(NonNullList<Ingredient> ingredients, ItemStack output,
-            TransformCircumstance circumstance) {
+                           TransformCircumstance circumstance) {
         this.ingredients = ingredients;
         this.output = output;
         this.circumstance = circumstance;
@@ -35,6 +69,10 @@ public final class TransformRecipe implements Recipe<Container> {
     @Override
     public NonNullList<Ingredient> getIngredients() {
         return ingredients;
+    }
+
+    public TransformCircumstance getCircumstance() {
+        return circumstance;
     }
 
     @Override

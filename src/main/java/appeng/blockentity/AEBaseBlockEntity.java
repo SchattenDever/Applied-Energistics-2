@@ -18,25 +18,30 @@
 
 package appeng.blockentity;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-
-import net.minecraft.core.HolderLookup;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
-import org.jetbrains.annotations.Nullable;
-
+import appeng.api.inventories.ISegmentedInventory;
+import appeng.api.inventories.InternalInventory;
+import appeng.api.networking.GridHelper;
+import appeng.api.orientation.BlockOrientation;
+import appeng.api.orientation.IOrientationStrategy;
+import appeng.api.orientation.RelativeSide;
+import appeng.block.AEBaseEntityBlock;
+import appeng.client.render.model.AEModelData;
+import appeng.core.AELog;
+import appeng.hooks.VisualStateSaving;
+import appeng.hooks.ticking.TickHandler;
+import appeng.items.tools.MemoryCardItem;
+import appeng.util.CustomNameUtil;
+import appeng.util.SettingsFrom;
+import appeng.util.helpers.ItemComparisonHelper;
 import io.netty.buffer.Unpooled;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -57,25 +62,21 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.client.model.data.ModelData;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import appeng.api.inventories.ISegmentedInventory;
-import appeng.api.inventories.InternalInventory;
-import appeng.api.networking.GridHelper;
-import appeng.api.orientation.BlockOrientation;
-import appeng.api.orientation.IOrientationStrategy;
-import appeng.api.orientation.RelativeSide;
-import appeng.block.AEBaseEntityBlock;
-import appeng.client.render.model.AEModelData;
-import appeng.core.AELog;
-import appeng.hooks.VisualStateSaving;
-import appeng.hooks.ticking.TickHandler;
-import appeng.items.tools.MemoryCardItem;
-import appeng.util.CustomNameUtil;
-import appeng.util.SettingsFrom;
-import appeng.util.helpers.ItemComparisonHelper;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 public class AEBaseBlockEntity extends BlockEntity
         implements Nameable, ISegmentedInventory, Clearable {
+    private static final Logger LOG = LoggerFactory.getLogger(AEBaseBlockEntity.class);
 
     private static final Map<BlockEntityType<?>, Item> REPRESENTATIVE_ITEMS = new HashMap<>();
     @Nullable
@@ -127,9 +128,17 @@ public class AEBaseBlockEntity extends BlockEntity
     public final void load(CompoundTag tag, HolderLookup.Provider registries) {
         // On the client, this can either be data received as part of an initial chunk update,
         // or as part of a sole block entity data update.
+        RegistryAccess registryAccess = null;
+        if (registries instanceof RegistryAccess) {
+            registryAccess = (RegistryAccess) registries;
+        } else if (level != null) {
+            registryAccess = level.registryAccess();
+        }
         if (tag.contains("#upd", Tag.TAG_BYTE_ARRAY) && tag.size() == 1) {
             var updateData = tag.getByteArray("#upd");
-            if (readUpdateData(new FriendlyByteBuf(Unpooled.wrappedBuffer(updateData)))) {
+            if (registryAccess == null) {
+                LOG.warn("Ignoring  update packet for {} since no registry is available.", this);
+            } else if (readUpdateData(new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(updateData), registryAccess))) {
                 // Triggers a chunk re-render if the level is already loaded
                 if (level != null) {
                     requestModelDataUpdate();
@@ -213,7 +222,7 @@ public class AEBaseBlockEntity extends BlockEntity
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         var data = new CompoundTag();
 
-        var stream = new FriendlyByteBuf(Unpooled.buffer());
+        var stream = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess());
         this.writeToStream(stream);
 
         stream.capacity(stream.readableBytes());
@@ -221,7 +230,7 @@ public class AEBaseBlockEntity extends BlockEntity
         return data;
     }
 
-    private boolean readUpdateData(FriendlyByteBuf stream) {
+    private boolean readUpdateData(RegistryFriendlyByteBuf stream) {
         boolean output = false;
 
         try {
@@ -238,17 +247,17 @@ public class AEBaseBlockEntity extends BlockEntity
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    protected boolean readFromStream(FriendlyByteBuf data) {
+    protected boolean readFromStream(RegistryFriendlyByteBuf data) {
         return false;
     }
 
-    protected void writeToStream(FriendlyByteBuf data) {
+    protected void writeToStream(RegistryFriendlyByteBuf data) {
     }
 
     /**
      * Used to store the state that is synchronized to clients for the visual appearance of this part as NBT. This is
      * only used to store this state for tools such as Create Ponders in Structure NBT. Actual synchronization uses
-     * {@link #writeToStream(FriendlyByteBuf)} and {@link #readFromStream(FriendlyByteBuf)}. Any data that is saved to
+     * {@link #writeToStream(RegistryFriendlyByteBuf)} and {@link #readFromStream(RegistryFriendlyByteBuf)}. Any data that is saved to
      * the NBT tag in {@link #saveAdditional(CompoundTag, HolderLookup.Provider)} does not need to be saved here again.
      * <p>
      * The data saved should be equivalent to the data sent to the client in {@link #writeToStream}.
@@ -274,7 +283,7 @@ public class AEBaseBlockEntity extends BlockEntity
             boolean alreadyUpdated = false;
             // Let the block update its own state with our internal state changes
             BlockState currentState = getBlockState();
-            if (currentState.getBlock() instanceof AEBaseEntityBlock<?>block) {
+            if (currentState.getBlock() instanceof AEBaseEntityBlock<?> block) {
                 BlockState newState = block.getBlockEntityBlockState(currentState, this);
                 if (currentState != newState) {
                     AELog.blockUpdate(this.worldPosition, currentState, newState, this);
@@ -428,7 +437,7 @@ public class AEBaseBlockEntity extends BlockEntity
      * Called when a player uses a wrench on this block entity to disassemble it.
      */
     public InteractionResult disassembleWithWrench(Player player, Level level, BlockHitResult hitResult,
-            ItemStack wrench) {
+                                                   ItemStack wrench) {
         var pos = hitResult.getBlockPos();
         var state = level.getBlockState(pos);
         var block = state.getBlock();

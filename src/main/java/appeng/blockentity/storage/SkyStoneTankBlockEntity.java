@@ -3,7 +3,7 @@ package appeng.blockentity.storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -36,14 +36,14 @@ public class SkyStoneTankBlockEntity extends AEBaseBlockEntity {
     public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
         super.saveAdditional(data, registries);
         if (!tank.isEmpty()) {
-            tank.writeToNBT(data);
+            tank.writeToNBT(registries, data);
         }
     }
 
     @Override
     public void loadTag(CompoundTag data, HolderLookup.Provider registries) {
         super.loadTag(data, registries);
-        tank.readFromNBT(data);
+        tank.readFromNBT(registries, data);
     }
 
     public boolean onPlayerUse(Player player, InteractionHand hand) {
@@ -58,16 +58,16 @@ public class SkyStoneTankBlockEntity extends AEBaseBlockEntity {
         return tank;
     }
 
-    protected boolean readFromStream(FriendlyByteBuf data) {
+    protected boolean readFromStream(RegistryFriendlyByteBuf data) {
         boolean ret = super.readFromStream(data);
-        tank.readFromNBT(data.readNbt());
+        tank.readFromNBT(data.registryAccess(), data.readNbt());
         return ret;
     }
 
-    protected void writeToStream(FriendlyByteBuf data) {
+    protected void writeToStream(RegistryFriendlyByteBuf data) {
         super.writeToStream(data);
         var tag = new CompoundTag();
-        tank.writeToNBT(tag);
+        tank.writeToNBT(data.registryAccess(), tag);
         data.writeNbt(tag);
     }
 }
