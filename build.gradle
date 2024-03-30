@@ -31,12 +31,11 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 minecraft {
-    mappings channel: 'snapshot', version: '20171003-1.12'
+    mappings channel: mapping_channel, version: mapping_version
+
     copyIdeResources = true
 
-    accessTransformers {
-        file('src/main/resources/appeng_at.cfg')
-    }
+    accessTransformer = file('src/main/resources/appeng_at.cfg')
 
     runs {
         configureEach {
@@ -84,32 +83,36 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 
 // Add Coremod Manifest
 jar {
+    manifest {
+        attributes 'FMLAT': 'appeng_at.cfg'
+    }
+
     // specify which files are really included, can control which APIs should be in
     include "appeng/**"
     include "assets/**"
     include "mcmod.info"
     include "pack.mcmeta"
+    include "META-INF/appeng_at.cfg"
 }
 
 
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${exact_version}"
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 }
 
 
-processResources
-{
+processResources {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
-    inputs.property "mcversion", exact_version
+    inputs.property "mcversion", "${minecraft_version}-${forge_version}"
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': exact_version
+        expand 'version': project.version, 'mcversion': "${minecraft_version}-${forge_version}"
     }
 
     // copy everything else, thats not the mcmod.info
