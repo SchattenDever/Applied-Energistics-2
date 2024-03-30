@@ -29,6 +29,7 @@ javadoc {
 }
 
 tasks.register('sourceJar', Jar) {
+	dependsOn('reobfJar')
 	from sourceSets.main.allSource
 }
 

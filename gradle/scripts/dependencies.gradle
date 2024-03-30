@@ -102,4 +102,5 @@ dependencies {
 
     // unit test dependencies
     testCompileOnly "junit:junit:4.12"
+    testCompileOnly "org.hamcrest:hamcrest-all:1.3"
 }
