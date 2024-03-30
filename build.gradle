@@ -17,10 +17,8 @@
  */
 
 plugins {
-    id 'org.sonarqube' version '2.6'
     id 'idea'
     id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
-    id 'jacoco'
 }
 
 version = aeversion + "-" + aechannel + "-" + aebuild
@@ -77,7 +75,6 @@ sourceSets {
 
 apply from: 'gradle/scripts/dependencies.gradle'
 apply from: 'gradle/scripts/artifacts.gradle'
-//apply from: 'gradle/scripts/optional.gradle'
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
@@ -87,22 +84,17 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 
 // Add Coremod Manifest
 jar {
-    manifest {
-        attributes 'FMLAT': 'appeng_at.cfg'
-    }
-
     // specify which files are really included, can control which APIs should be in
     include "appeng/**"
     include "assets/**"
     include "mcmod.info"
     include "pack.mcmeta"
-    include "META-INF/appeng_at.cfg"
 }
 
 
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:' + exact_version
+    minecraft "net.minecraftforge:forge:${exact_version}"
 }
 
 

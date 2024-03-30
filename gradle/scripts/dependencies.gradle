@@ -54,25 +54,15 @@ repositories {
         url "https://maven.k-4u.nl/"
     }
 
-//    maven { // Hwyla
-//        name 'tehnut'
-//        url "http://tehnut.info/maven"
-//    }
-
-   	maven { // CraftTweaker
+    maven { // CraftTweaker
         name 'jared maven'
         url "https://maven.blamejared.com/"
     }
 
-    //maven { // modmaven, maven proxy
-    //    name 'modmaven'
-    //    url "https://modmaven.k-4u.nl/"
-    //}
-
     maven {
-		name = "CurseForge"
-		url = "https://minecraft.curseforge.com/api/maven/"
-	}
+        name = "CurseForge"
+        url = "https://minecraft.curseforge.com/api/maven/"
+    }
 }
 
 configurations {
