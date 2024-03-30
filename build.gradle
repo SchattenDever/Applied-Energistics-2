@@ -16,59 +16,77 @@
  * along with Applied Energistics 2.  If not, see <http://www.gnu.org/licenses/lgpl>.
  */
 
-buildscript {
-    repositories {
-        mavenLocal()
-        jcenter()
-        mavenCentral()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
-}
-
 plugins {
-  id "org.sonarqube" version "2.6"
-}
-
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'jacoco'
-
-repositories {
-    mavenLocal()
-    jcenter()
-    mavenCentral()
-}
-
-apply from: 'gradle/scripts/dependencies.gradle'
-apply from: 'gradle/scripts/artifacts.gradle'
-apply from: 'gradle/scripts/optional.gradle'
-
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
-// ensure everything uses UTF-8 and not some random codepage chosen by gradle
-compileJava.options.encoding = 'UTF-8'
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+    id 'org.sonarqube' version '2.6'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+    id 'jacoco'
 }
 
 version = aeversion + "-" + aechannel + "-" + aebuild
 group = aegroup
-archivesBaseName = aebasename
+
+base {
+    archivesName = aebasename
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+
+minecraft {
+    mappings channel: 'snapshot', version: '20171003-1.12'
+    copyIdeResources = true
+
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+        }
+
+        client {
+            property 'forge.enabledGameTestNamespaces', aebasename
+        }
+
+        server {
+            property 'forge.enabledGameTestNamespaces', aebasename
+            args '--nogui'
+        }
+
+        data {
+            workingDirectory project.file('run-data')
+
+            args '--mod', aebasename, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        }
+    }
+}
+
+
+
+
+sourceSets {
+    main {
+        java {
+            srcDir('main')
+        }
+    }
+}
+
+apply from: 'gradle/scripts/dependencies.gradle'
+apply from: 'gradle/scripts/artifacts.gradle'
+//apply from: 'gradle/scripts/optional.gradle'
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 // Add Coremod Manifest
 jar {
     manifest {
         attributes 'FMLAT': 'appeng_at.cfg'
     }
-
-    from sourceSets.api.output
-    dependsOn apiClasses
 
     // specify which files are really included, can control which APIs should be in
     include "appeng/**"
@@ -78,37 +96,23 @@ jar {
     include "META-INF/appeng_at.cfg"
 }
 
-minecraft {
-    version = minecraft_version + "-" + forge_version
 
-    replaceIn "AEConfig.java"
-    replaceIn "package-info.java"
 
-    replace "@version@", project.version
-    replace "@aeversion@", aeversion
-    replace "@aechannel@", aechannel
-    replace "@aebuild@", aebuild
-
-    // used when launching minecraft in dev env
-    runDir = "run"
-    mappings = mcp_mappings
+dependencies {
+    minecraft 'net.minecraftforge:forge:' + exact_version
 }
 
-sourceSets {
-    api
-    main
-}
 
 processResources
 {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+    inputs.property "mcversion", exact_version
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+        expand 'version': project.version, 'mcversion': exact_version
     }
 
     // copy everything else, thats not the mcmod.info

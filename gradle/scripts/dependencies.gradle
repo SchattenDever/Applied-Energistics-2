@@ -21,17 +21,17 @@ repositories {
 
     maven {
         name "Mobius"
-        url "http://mobiusstrip.eu/maven"
+        url "https://mobiusstrip.eu/maven"
     }
 
     maven {
         name = "JEI repo"
-        url "http://dvs1.progwml6.com/files/maven"
+        url "https://dvs1.progwml6.com/files/maven"
     }
 
     maven {
         name = "Tesla repo"
-        url "http://maven.mcmoddev.com"
+        url "https://maven.mcmoddev.com"
     }
 
     maven {
@@ -41,17 +41,17 @@ repositories {
 
     maven {
         name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
+        url = "https://maven.covers1624.net"
     }
 
     maven { // TheOneProbe
         name 'tterrag maven'
-        url "http://maven.tterrag.com/"
+        url "https://maven.tterrag.com/"
     }
 
     maven { // McJtyLib
         name 'mcjty'
-        url "http://maven.k-4u.nl/"
+        url "https://maven.k-4u.nl/"
     }
 
 //    maven { // Hwyla
@@ -61,7 +61,7 @@ repositories {
 
    	maven { // CraftTweaker
         name 'jared maven'
-        url "http://maven.blamejared.com/"
+        url "https://maven.blamejared.com/"
     }
 
     //maven { // modmaven, maven proxy
@@ -87,18 +87,18 @@ dependencies {
 
     // compile against provided APIs
     compileOnly "mezz.jei:jei_${minecraft_version}:${jei_version}:api"
-    compileOnly "mcp.mobius.waila:Hwyla:${hwyla_version}"
+    compileOnly "curse.maven:hwyla-253449:2568751"
     compileOnly "net.darkhax.tesla:Tesla-1.12.2:${tesla_version}"
     compileOnly "curse.maven:industrial-craft-242638:2547177"
     compileOnly "mcjty.theoneprobe:TheOneProbe-1.12:${top_version}:api"
     compileOnly "cofh:CoFHCore:${cofhcore_version}:deobf"
     compileOnly "CraftTweaker2:CraftTweaker2-API:${crafttweaker_version}"
-	compileOnly "inventory-tweaks:InventoryTweaks:${inventorytweaks_version}:api"
+	compileOnly "curse.maven:inventory-tweaks-223094:2482482"
     compileOnly "team.chisel.ctm:CTM:${ctm_version}"
 
     // at runtime, use the full JEI jar
-    runtime "mezz.jei:jei_${minecraft_version}:${jei_version}"
+    runtimeOnly "mezz.jei:jei_${minecraft_version}:${jei_version}"
 
     // unit test dependencies
-    testCompile "junit:junit:4.12"
+    testCompileOnly "junit:junit:4.12"
 }
