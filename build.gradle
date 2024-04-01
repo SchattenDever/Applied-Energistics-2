@@ -106,17 +106,6 @@ tasks.named('jar', Jar).configure {
         ])
     }
 
-    var replaceProperties = [
-            "@version@": project.version,
-            "@aeversion@": aeversion,
-            "@aechannel@": aechannel,
-            "@aebuild@": aebuild
-    ]
-    inputs.properties replaceProperties
-    filesMatching(['appeng/core/AEConfig.java', 'appeng/api/package-info.java']) {
-        expand replaceProperties
-    }
-
     // This is the preferred method to reobfuscate your jar file
     finalizedBy 'reobfJar'
 }
