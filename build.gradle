@@ -35,7 +35,7 @@ minecraft {
 
     copyIdeResources = true
 
-    accessTransformer = file('src/main/resources/appeng_at.cfg')
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         configureEach {
@@ -62,12 +62,10 @@ minecraft {
 }
 
 
-
-
 sourceSets {
     main {
-        java {
-            srcDir('main')
+        resources {
+            srcDir 'src/generated/resources'
         }
     }
 }
@@ -81,45 +79,44 @@ tasks.withType(JavaCompile).configureEach {
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
-// Add Coremod Manifest
-jar {
-    manifest {
-        attributes 'FMLAT': 'appeng_at.cfg'
-    }
-
-    // specify which files are really included, can control which APIs should be in
-    include "appeng/**"
-    include "assets/**"
-    include "mcmod.info"
-    include "pack.mcmeta"
-    include "META-INF/appeng_at.cfg"
-}
-
-
-
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 }
 
+artifacts {
+    jar
+}
 
-processResources {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            version: project.version,
+            mcversion: minecraft_version,
+            forge_version: forge_version
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['mcmod.info']) {
+        expand replaceProperties + [project: project]
+    }
+}
 
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", "${minecraft_version}-${forge_version}"
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': "${minecraft_version}-${forge_version}"
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'FMLAT': 'accesstransformer.cfg'
+        ])
     }
 
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+    var replaceProperties = [
+            "@version@": project.version,
+            "@aeversion@": aeversion,
+            "@aechannel@": aechannel,
+            "@aebuild@": aebuild
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['appeng/core/AEConfig.java', 'appeng/api/package-info.java']) {
+        expand replaceProperties
     }
 
-    // move access transformer to META-INF
-    rename '(.+_at.cfg)', 'META-INF/$1'
+    // This is the preferred method to reobfuscate your jar file
+    finalizedBy 'reobfJar'
 }
