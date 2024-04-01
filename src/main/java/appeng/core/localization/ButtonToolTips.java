@@ -96,6 +96,7 @@ public enum ButtonToolTips
 	Disabled,
 	Enable,
 
+	Waiting,
 	Blocking,
 	NonBlocking,
 

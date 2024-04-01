@@ -21,6 +21,7 @@ package appeng.client.gui.implementations;
 
 import java.io.IOException;
 
+import appeng.api.config.BlockingMode;
 import org.lwjgl.input.Mouse;
 
 import net.minecraft.client.gui.GuiButton;
@@ -59,7 +60,7 @@ public class GuiInterface extends GuiUpgradeable
 		this.priority = new GuiTabButton( this.guiLeft + 154, this.guiTop, 2 + 4 * 16, GuiText.Priority.getLocal(), this.itemRender );
 		this.buttonList.add( this.priority );
 
-		this.BlockMode = new GuiImgButton( this.guiLeft - 18, this.guiTop + 8, Settings.BLOCK, YesNo.NO );
+		this.BlockMode = new GuiImgButton( this.guiLeft - 18, this.guiTop + 8, Settings.BLOCKING_MODE, BlockingMode.NORMAL );
 		this.buttonList.add( this.BlockMode );
 
 		this.interfaceMode = new GuiToggleButton( this.guiLeft - 18, this.guiTop + 26, 84, 85, GuiText.InterfaceTerminal

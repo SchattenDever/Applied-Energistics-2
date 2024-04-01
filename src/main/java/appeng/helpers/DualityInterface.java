@@ -19,16 +19,12 @@
 package appeng.helpers;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import javax.annotation.Nullable;
 
+import appeng.api.config.*;
+import appeng.core.AELog;
 import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.block.Block;
@@ -51,10 +47,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.RangedWrapper;
 
 import appeng.api.AEApi;
-import appeng.api.config.Actionable;
-import appeng.api.config.Settings;
-import appeng.api.config.Upgrades;
-import appeng.api.config.YesNo;
 import appeng.api.implementations.ICraftingPatternItem;
 import appeng.api.implementations.IUpgradeableHost;
 import appeng.api.implementations.tiles.ICraftingMachine;
@@ -142,6 +134,7 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 	private IMEInventory<IAEItemStack> destination;
 	private int isWorking = -1;
 	private final Accessor accessor = new Accessor();
+	private List<IAEItemStack> waitingFor = null;
 
 	public DualityInterface( final AENetworkProxy networkProxy, final IInterfaceHost ih )
 	{
@@ -149,7 +142,7 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 		this.gridProxy.setFlags( GridFlags.REQUIRE_CHANNEL );
 
 		this.upgrades = new StackUpgradeInventory( this.gridProxy.getMachineRepresentation(), this, 1 );
-		this.cm.registerSetting( Settings.BLOCK, YesNo.NO );
+		this.cm.registerSetting( Settings.BLOCKING_MODE, BlockingMode.NORMAL );
 		this.cm.registerSetting( Settings.INTERFACE_TERMINAL, YesNo.YES );
 
 		this.iHost = ih;
@@ -211,6 +204,10 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 					// :P
 				}
 			}
+
+			if (mc == InvOperation.INSERT) {
+				updateWaitingFor(added);
+			}
 		}
 	}
 
@@ -235,22 +232,41 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 			}
 		}
 		data.setTag( "waitingToSend", waitingToSend );
+
+		final NBTTagList waitingFor = new NBTTagList();
+		if (this.waitingFor != null)
+		{
+			for (final IAEItemStack stack : this.waitingFor) {
+				final NBTTagCompound item = new NBTTagCompound();
+				stack.writeToNBT(item);
+				waitingFor.appendTag(item);
+			}
+		}
+		data.setTag("waitingFor", waitingFor);
 	}
 
 	public void readFromNBT( final NBTTagCompound data )
 	{
 		this.waitingToSend = null;
 		final NBTTagList waitingList = data.getTagList( "waitingToSend", 10 );
-		if( waitingList != null )
+		if( waitingList.tagCount() > 0)
 		{
 			for( int x = 0; x < waitingList.tagCount(); x++ )
 			{
 				final NBTTagCompound c = waitingList.getCompoundTagAt( x );
-				if( c != null )
-				{
-					final ItemStack is = new ItemStack( c );
-					this.addToSendList( is );
-				}
+				final ItemStack is = new ItemStack( c );
+				this.addToSendList( is );
+			}
+		}
+
+		this.waitingFor = null;
+		final NBTTagList waitingFor = data.getTagList("waitingFor", 10);
+		if (waitingFor.tagCount() > 0) {
+			this.waitingFor = new ArrayList<>(waitingFor.tagCount());
+			for (int i = 0; i < waitingFor.tagCount(); i++) {
+				final NBTTagCompound c = waitingFor.getCompoundTagAt(i);
+				final IAEItemStack stack = AEItemStack.fromNBT(c);
+				this.waitingFor.add(stack);
 			}
 		}
 
@@ -861,6 +877,9 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 		{
 			this.cancelCrafting();
 		}
+		if (settingName == Settings.BLOCKING_MODE && newValue != BlockingMode.WAITING) {
+			waitingFor = null;
+		}
 		this.iHost.saveChanges();
 	}
 
@@ -893,11 +912,45 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 		};
 	}
 
+	private void updateWaitingFor(ItemStack inserted) {
+		if (waitingFor != null) {
+			ListIterator<IAEItemStack> iterator = waitingFor.listIterator();
+			while (iterator.hasNext()) {
+				IAEItemStack stack = iterator.next();
+				if (stack.isSameType(inserted)) {
+					stack.decStackSize(inserted.getCount());
+					if (stack.getStackSize() <= 0) {
+						iterator.remove();
+						break;
+					}
+				}
+			}
+			if (waitingFor.isEmpty()) {
+				waitingFor = null;
+			}
+			AELog.info("updated waitingFor: %s", waitingFor);
+		}
+	}
+
+	private void registerWaitingIfNeeded(ICraftingPatternDetails pattern) {
+		if (isWaiting()) {
+			IAEItemStack[] outputItems = pattern.getCondensedOutputs();
+			waitingFor = new ArrayList<>(outputItems.length);
+			for (final IAEItemStack item : outputItems) {
+				waitingFor.add(item.copy());
+			}
+			AELog.info("waitingFor: %s", waitingFor);
+		}
+	}
+
 	@Override
 	public boolean pushPattern( final ICraftingPatternDetails patternDetails, final InventoryCrafting table )
 	{
 		if( this.hasItemsToSend() || !this.gridProxy.isActive() || !this.craftingList.contains( patternDetails ) )
 		{
+			return false;
+		}
+		if (isWaiting() && waitingFor != null) {
 			return false;
 		}
 
@@ -930,6 +983,7 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 				{
 					if( cm.pushPattern( patternDetails, table, s.getOpposite() ) )
 					{
+						registerWaitingIfNeeded(patternDetails);
 						return true;
 					}
 					continue;
@@ -959,6 +1013,7 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 						}
 					}
 					this.pushItemsOut( possibleDirections );
+					registerWaitingIfNeeded(patternDetails);
 					return true;
 				}
 			}
@@ -1013,7 +1068,12 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 
 	private boolean isBlocking()
 	{
-		return this.cm.getSetting( Settings.BLOCK ) == YesNo.YES;
+		return this.cm.getSetting( Settings.BLOCKING_MODE) == BlockingMode.BLOCKING;
+	}
+
+	private boolean isWaiting()
+	{
+		return this.cm.getSetting( Settings.BLOCKING_MODE ) == BlockingMode.WAITING;
 	}
 
 	private boolean acceptsItems( final InventoryAdaptor ad, final InventoryCrafting table )

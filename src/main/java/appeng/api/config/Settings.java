@@ -57,7 +57,7 @@ public enum Settings
 
 	IO_DIRECTION( EnumSet.of( RelativeDirection.LEFT, RelativeDirection.RIGHT ) ),
 
-	BLOCK( EnumSet.of( YesNo.YES, YesNo.NO ) ),
+	BLOCKING_MODE( EnumSet.allOf( BlockingMode.class ) ),
 
 	OPERATION_MODE( EnumSet.allOf( OperationMode.class ) ),
 

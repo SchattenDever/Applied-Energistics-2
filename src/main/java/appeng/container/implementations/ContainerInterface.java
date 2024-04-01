@@ -19,6 +19,7 @@
 package appeng.container.implementations;
 
 
+import appeng.api.config.BlockingMode;
 import net.minecraft.entity.player.InventoryPlayer;
 
 import appeng.api.config.SecurityPermissions;
@@ -39,7 +40,7 @@ public class ContainerInterface extends ContainerUpgradeable
 	private final DualityInterface myDuality;
 
 	@GuiSync( 3 )
-	public YesNo bMode = YesNo.NO;
+	public BlockingMode bMode = BlockingMode.NORMAL;
 
 	@GuiSync( 4 )
 	public YesNo iTermMode = YesNo.YES;
@@ -95,16 +96,16 @@ public class ContainerInterface extends ContainerUpgradeable
 	@Override
 	protected void loadSettingsFromHost( final IConfigManager cm )
 	{
-		this.setBlockingMode( (YesNo) cm.getSetting( Settings.BLOCK ) );
+		this.setBlockingMode( (BlockingMode) cm.getSetting( Settings.BLOCKING_MODE) );
 		this.setInterfaceTerminalMode( (YesNo) cm.getSetting( Settings.INTERFACE_TERMINAL ) );
 	}
 
-	public YesNo getBlockingMode()
+	public BlockingMode getBlockingMode()
 	{
 		return this.bMode;
 	}
 
-	private void setBlockingMode( final YesNo bMode )
+	private void setBlockingMode( final BlockingMode bMode )
 	{
 		this.bMode = bMode;
 	}

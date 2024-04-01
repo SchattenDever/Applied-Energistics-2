@@ -23,32 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import appeng.api.config.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
 
-import appeng.api.config.AccessRestriction;
-import appeng.api.config.ActionItems;
-import appeng.api.config.CondenserOutput;
-import appeng.api.config.FullnessMode;
-import appeng.api.config.FuzzyMode;
-import appeng.api.config.ItemSubstitution;
-import appeng.api.config.LevelType;
-import appeng.api.config.OperationMode;
-import appeng.api.config.PowerUnits;
-import appeng.api.config.RedstoneMode;
-import appeng.api.config.RelativeDirection;
-import appeng.api.config.SchedulingMode;
-import appeng.api.config.SearchBoxMode;
-import appeng.api.config.Settings;
-import appeng.api.config.SortDir;
-import appeng.api.config.SortOrder;
-import appeng.api.config.StorageFilter;
-import appeng.api.config.TerminalStyle;
-import appeng.api.config.ViewItems;
-import appeng.api.config.YesNo;
 import appeng.core.localization.ButtonToolTips;
 
 
@@ -152,8 +133,9 @@ public class GuiImgButton extends GuiButton implements ITooltip
 			this.registerApp( 81, Settings.FULLNESS_MODE, FullnessMode.HALF, ButtonToolTips.OperationMode, ButtonToolTips.MoveWhenWorkIsDone );
 			this.registerApp( 82, Settings.FULLNESS_MODE, FullnessMode.FULL, ButtonToolTips.OperationMode, ButtonToolTips.MoveWhenFull );
 
-			this.registerApp( 16 + 5, Settings.BLOCK, YesNo.YES, ButtonToolTips.InterfaceBlockingMode, ButtonToolTips.Blocking );
-			this.registerApp( 16 + 4, Settings.BLOCK, YesNo.NO, ButtonToolTips.InterfaceBlockingMode, ButtonToolTips.NonBlocking );
+			this.registerApp(16 + 8, Settings.BLOCKING_MODE, BlockingMode.WAITING, ButtonToolTips.InterfaceBlockingMode, ButtonToolTips.Waiting );
+			this.registerApp( 16 + 5, Settings.BLOCKING_MODE, BlockingMode.BLOCKING, ButtonToolTips.InterfaceBlockingMode, ButtonToolTips.Blocking );
+			this.registerApp( 16 + 4, Settings.BLOCKING_MODE, BlockingMode.NORMAL, ButtonToolTips.InterfaceBlockingMode, ButtonToolTips.NonBlocking );
 
 			this.registerApp( 16 + 3, Settings.CRAFT_ONLY, YesNo.YES, ButtonToolTips.Craft, ButtonToolTips.CraftOnly );
 			this.registerApp( 16 + 2, Settings.CRAFT_ONLY, YesNo.NO, ButtonToolTips.Craft, ButtonToolTips.CraftEither );

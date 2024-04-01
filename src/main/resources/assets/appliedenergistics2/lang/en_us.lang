@@ -314,6 +314,7 @@ gui.tooltips.appliedenergistics2.Disabled=Disabled
 gui.tooltips.appliedenergistics2.Enable=Enabled
 gui.tooltips.appliedenergistics2.Blocking=Do not push crafting items if inventory contains items.
 gui.tooltips.appliedenergistics2.NonBlocking=Ignore the contents of the target inventory.
+gui.tooltips.appliedenergistics2.Waiting=Only push crafting items for one recipe at a time, waiting for the crafting process to finish before continuing.
 gui.tooltips.appliedenergistics2.Craft=Crafting Behavior
 gui.tooltips.appliedenergistics2.CraftOnly=Do not use stocked items, only craft items while exporting.
 gui.tooltips.appliedenergistics2.CraftEither=Use stocked items, or craft items while exporting.
