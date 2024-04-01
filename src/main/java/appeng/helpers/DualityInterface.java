@@ -24,7 +24,6 @@ import java.util.*;
 import javax.annotation.Nullable;
 
 import appeng.api.config.*;
-import appeng.core.AELog;
 import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.block.Block;
@@ -928,7 +927,6 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 			if (waitingFor.isEmpty()) {
 				waitingFor = null;
 			}
-			AELog.info("updated waitingFor: %s", waitingFor);
 		}
 	}
 
@@ -939,7 +937,6 @@ public class DualityInterface implements IGridTickable, IStorageMonitorable, IIn
 			for (final IAEItemStack item : outputItems) {
 				waitingFor.add(item.copy());
 			}
-			AELog.info("waitingFor: %s", waitingFor);
 		}
 	}
 
